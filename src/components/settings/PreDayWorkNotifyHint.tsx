@@ -31,8 +31,8 @@ export function PreDayWorkNotifyHint() {
     <span className="group/help relative inline-flex align-middle">
       <button
         type="button"
-        className="inline-flex size-4 items-center justify-center rounded-full border border-border/60 bg-background text-[10px] font-bold leading-none text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        aria-label="근무 전날 알림 조별 시간 보기"
+        className="inline-flex size-3.5 items-center justify-center rounded-full border border-border/60 bg-background text-[9px] font-bold leading-none text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        aria-label="조별 전날 알림 시간 보기"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
@@ -42,19 +42,19 @@ export function PreDayWorkNotifyHint() {
       <span
         role="tooltip"
         className={cn(
-          "absolute left-0 top-[calc(100%+0.375rem)] z-30 w-max max-w-[15rem] rounded-lg border border-border/60 bg-popover px-2.5 py-2 text-[11px] leading-relaxed text-popover-foreground shadow-md",
+          "absolute left-0 top-[calc(100%+0.25rem)] z-30 w-max max-w-[13rem] rounded-lg border border-border/60 bg-popover px-2 py-1.5 text-[10px] leading-relaxed text-popover-foreground shadow-md",
           "pointer-events-none opacity-0 transition-opacity",
           "group-hover/help:pointer-events-auto group-hover/help:opacity-100",
           "group-focus-within/help:pointer-events-auto group-focus-within/help:opacity-100",
           open && "pointer-events-auto opacity-100",
         )}
       >
-        <span className="mb-1 block font-semibold text-foreground">조별 전날 알림</span>
+        <span className="mb-1 block text-[10px] font-semibold text-foreground">조별 알림</span>
         <ul className="space-y-0.5 text-muted-foreground">
           {rows.map((row) => (
-            <li key={row.name}>
+            <li key={row.name} className="tabular-nums">
               {row.name} {row.time}
-              <span className="text-muted-foreground/80"> (시작 {row.start})</span>
+              <span className="text-muted-foreground/70"> · {row.start} 시작</span>
             </li>
           ))}
         </ul>
