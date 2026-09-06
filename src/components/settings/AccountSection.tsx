@@ -64,22 +64,6 @@ export function AccountSection() {
         )}
       </section>
 
-      <section className="app-card p-6">
-        <h2 className="mb-4 text-sm font-medium text-muted-foreground">근무 시간</h2>
-        <dl className="space-y-2 text-sm">
-          {shiftSettings.shiftDefinitions
-            .filter((item) => item.code !== "OFF")
-            .map((item) => (
-              <div key={item.code} className="flex justify-between">
-                <dt>{item.name}</dt>
-                <dd>
-                  {item.startTime} ~ {item.endTime}
-                </dd>
-              </div>
-            ))}
-        </dl>
-      </section>
-
       <Card>
         <CardHeader>
           <CardTitle>계정</CardTitle>
