@@ -25,6 +25,8 @@ export function PushNotificationSection() {
 
   const needsPwaInstall = isIosDevice() && !isPwaInstalled();
 
+  const canManagePush = isSubscribed || permission === "granted";
+
   async function handleSubscribe() {
     setMessage(null);
     try {
@@ -112,7 +114,7 @@ export function PushNotificationSection() {
             </div>
           </dl>
 
-          {!isSubscribed ? (
+          {!canManagePush ? (
             <Button
               className="w-full"
               onClick={() => void handleSubscribe()}
@@ -123,13 +125,22 @@ export function PushNotificationSection() {
           ) : (
             <div className="flex flex-col gap-2">
               <Button
-                variant="outline"
                 className="w-full"
                 onClick={() => void handleTestNotification()}
                 disabled={isWorking}
               >
                 테스트 알림 보내기
               </Button>
+              {!isSubscribed && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => void handleSubscribe()}
+                  disabled={isWorking}
+                >
+                  {isWorking ? "구독 중..." : "구독 다시 시도"}
+                </Button>
+              )}
               <Button
                 variant="destructive"
                 className="w-full"

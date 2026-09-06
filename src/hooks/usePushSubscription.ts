@@ -39,11 +39,17 @@ export function usePushSubscription() {
         }
 
         const nextPermission = Notification.permission;
-        const subscription = await getLocalPushSubscription();
+        let subscription: PushSubscription | null = null;
+
+        try {
+          subscription = await getLocalPushSubscription();
+        } catch {
+          subscription = null;
+        }
 
         if (!cancelled) {
           setPermission(nextPermission);
-          setIsSubscribed(Boolean(subscription));
+          setIsSubscribed(Boolean(subscription) || nextPermission === "granted");
         }
       } finally {
         if (!cancelled) {
@@ -73,6 +79,8 @@ export function usePushSubscription() {
 
     try {
       await subscribeToPush(user.id);
+      setPermission("granted");
+      setIsSubscribed(true);
       reload();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Push 구독에 실패했습니다.";
@@ -93,6 +101,8 @@ export function usePushSubscription() {
 
     try {
       await unsubscribeFromPush(user.id);
+      setPermission(Notification.permission);
+      setIsSubscribed(false);
       reload();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Push 구독 해제에 실패했습니다.";
