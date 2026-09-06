@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { isLocalUser } from "@/lib/repositories/getUserId";
 import { getVapidPublicKey } from "@/lib/push/config";
 import { urlBase64ToUint8Array } from "@/lib/push/vapid";
 import { isPushSupported, registerServiceWorker } from "@/lib/pwa/registerServiceWorker";
@@ -51,6 +52,11 @@ export async function subscribeToPush(userId: string): Promise<PushSubscriptionP
     }));
 
   const payload = serializePushSubscription(subscription);
+
+  if (isLocalUser(userId)) {
+    return payload;
+  }
+
   const supabase = createClient();
 
   if (!supabase) {
@@ -88,7 +94,7 @@ export async function unsubscribeFromPush(userId: string): Promise<void> {
     await subscription.unsubscribe();
 
     const supabase = createClient();
-    if (supabase) {
+    if (supabase && !isLocalUser(userId)) {
       await supabase
         .from("push_subscriptions")
         .delete()
@@ -96,6 +102,15 @@ export async function unsubscribeFromPush(userId: string): Promise<void> {
         .eq("endpoint", endpoint);
     }
   }
+}
+
+export async function getPushSubscriptionPayload(): Promise<PushSubscriptionPayload | null> {
+  const subscription = await getLocalPushSubscription();
+  if (!subscription) {
+    return null;
+  }
+
+  return serializePushSubscription(subscription);
 }
 
 export async function getLocalPushSubscription(): Promise<PushSubscription | null> {

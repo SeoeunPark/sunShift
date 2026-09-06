@@ -8,10 +8,12 @@ import {
 } from "@/lib/push/subscription";
 import { getVapidPublicKey } from "@/lib/push/config";
 import { isPushSupported } from "@/lib/pwa/registerServiceWorker";
+import { resolveUserId } from "@/lib/repositories/getUserId";
 import { useAuth } from "@/stores/authStore";
 
 export function usePushSubscription() {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
+  const userId = resolveUserId(user?.id);
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -63,22 +65,18 @@ export function usePushSubscription() {
     return () => {
       cancelled = true;
     };
-  }, [isSupported, reloadToken, user?.id]);
+  }, [isSupported, reloadToken, userId]);
 
   const reload = useCallback(() => {
     setReloadToken((value) => value + 1);
   }, []);
 
   const subscribe = useCallback(async () => {
-    if (!user) {
-      throw new Error("로그인 후 Push 알림을 사용할 수 있습니다.");
-    }
-
     setIsWorking(true);
     setError(null);
 
     try {
-      await subscribeToPush(user.id);
+      await subscribeToPush(userId);
       setPermission("granted");
       setIsSubscribed(true);
       reload();
@@ -89,18 +87,14 @@ export function usePushSubscription() {
     } finally {
       setIsWorking(false);
     }
-  }, [reload, user]);
+  }, [reload, userId]);
 
   const unsubscribe = useCallback(async () => {
-    if (!user) {
-      return;
-    }
-
     setIsWorking(true);
     setError(null);
 
     try {
-      await unsubscribeFromPush(user.id);
+      await unsubscribeFromPush(userId);
       setPermission(Notification.permission);
       setIsSubscribed(false);
       reload();
@@ -111,12 +105,11 @@ export function usePushSubscription() {
     } finally {
       setIsWorking(false);
     }
-  }, [reload, user]);
+  }, [reload, userId]);
 
   return {
     isSupported,
     isConfigured,
-    isAuthenticated,
     permission,
     isSubscribed,
     isLoading,

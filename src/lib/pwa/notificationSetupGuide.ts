@@ -14,7 +14,6 @@ export const ANDROID_HOME_SCREEN_STEPS = [
 
 export const IOS_NOTIFICATION_SETUP_STEPS = [
   "홈 화면 SHIFT 아이콘으로 열기 (Safari 탭 ❌)",
-  "로그인",
   "설정 → Push 알림 켜기",
   "「알림 허용」 선택",
   "근무 · 수면 알림에서 종류 선택",
@@ -22,7 +21,6 @@ export const IOS_NOTIFICATION_SETUP_STEPS = [
 
 export const ANDROID_NOTIFICATION_SETUP_STEPS = [
   "홈 화면 SHIFT 아이콘으로 열기",
-  "로그인",
   "설정 → Push 알림 켜기",
   "「알림 허용」 선택",
   "근무 · 수면 알림에서 종류 선택",

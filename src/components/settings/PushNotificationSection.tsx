@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PwaNotificationGuide } from "@/components/pwa/PwaNotificationGuide";
 import { usePushSubscription } from "@/hooks/usePushSubscription";
+import { getPushSubscriptionPayload } from "@/lib/push/subscription";
 import { getIosPushRequirementNote, isIosDevice } from "@/lib/pwa/notificationSetupGuide";
 import { isPwaInstalled } from "@/lib/pwa/registerServiceWorker";
 
@@ -12,7 +12,6 @@ export function PushNotificationSection() {
   const {
     isSupported,
     isConfigured,
-    isAuthenticated,
     permission,
     isSubscribed,
     isLoading,
@@ -50,12 +49,21 @@ export function PushNotificationSection() {
   async function handleTestNotification() {
     setMessage(null);
     try {
-      const response = await fetch("/api/push/test", { method: "POST" });
-      const payload = (await response.json()) as { message?: string; error?: string };
-      if (!response.ok) {
-        throw new Error(payload.error ?? "테스트 알림 전송에 실패했습니다.");
+      const subscription = await getPushSubscriptionPayload();
+      if (!subscription) {
+        throw new Error("Push 구독 정보를 찾을 수 없습니다. Push 알림을 다시 켜 주세요.");
       }
-      setMessage(payload.message ?? "테스트 알림을 보냈습니다.");
+
+      const response = await fetch("/api/push/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(subscription),
+      });
+      const result = (await response.json()) as { message?: string; error?: string };
+      if (!response.ok) {
+        throw new Error(result.error ?? "테스트 알림 전송에 실패했습니다.");
+      }
+      setMessage(result.message ?? "테스트 알림을 보냈습니다.");
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "테스트 알림 전송에 실패했습니다.");
     }
@@ -89,18 +97,6 @@ export function PushNotificationSection() {
           </p>
           {isIosDevice() && <PwaNotificationGuide compact />}
         </div>
-      ) : !isAuthenticated ? (
-        <div className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Push 구독은 로그인한 계정에 연결됩니다.
-          </p>
-          <Link
-            href="/auth/login"
-            className="inline-flex h-9 w-full items-center justify-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
-          >
-            로그인하기
-          </Link>
-        </div>
       ) : (
         <div className="space-y-3">
           <dl className="space-y-2 text-sm">
@@ -113,6 +109,11 @@ export function PushNotificationSection() {
               <dd>{isSubscribed ? "활성" : "비활성"}</dd>
             </div>
           </dl>
+
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            로그인 없이도 테스트 알림은 받을 수 있습니다. 자동 근무·수면 알림은 로그인 후
+            클라우드 동기화가 필요합니다.
+          </p>
 
           {!canManagePush ? (
             <Button

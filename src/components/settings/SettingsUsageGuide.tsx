@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 const NOTIFICATION_FLOW = [
   "아래 「홈 화면에 추가」에서 설치",
   "홈 화면 SHIFT 아이콘으로 열기",
-  "로그인",
   "Push 알림 켜기 + 알림 허용",
   "근무 · 수면 알림에서 종류 선택",
 ] as const;

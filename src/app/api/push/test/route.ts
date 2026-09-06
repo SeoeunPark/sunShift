@@ -1,16 +1,46 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isPushConfigured } from "@/lib/push/config";
+import type { PushSubscriptionPayload } from "@/lib/push/subscription";
 import { sendTestPushNotification } from "@/lib/push/sendWebPush";
 
-export async function POST() {
+function isValidPayload(body: unknown): body is PushSubscriptionPayload {
+  if (!body || typeof body !== "object") {
+    return false;
+  }
+
+  const candidate = body as Partial<PushSubscriptionPayload>;
+  return Boolean(candidate.endpoint && candidate.p256dh && candidate.auth);
+}
+
+async function sendToPayload(payload: PushSubscriptionPayload) {
+  await sendTestPushNotification(payload);
+  return NextResponse.json({
+    message: "테스트 알림을 보냈습니다.",
+    sent: 1,
+  });
+}
+
+export async function POST(request: Request) {
   if (!isPushConfigured()) {
     return NextResponse.json({ error: "VAPID keys are not configured" }, { status: 503 });
   }
 
+  const body = (await request.json().catch(() => null)) as unknown;
+  if (isValidPayload(body)) {
+    try {
+      return await sendToPayload(body);
+    } catch (err) {
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : "Failed to send test notification" },
+        { status: 500 },
+      );
+    }
+  }
+
   const supabase = await createClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Supabase is not configured" }, { status: 503 });
+    return NextResponse.json({ error: "Push subscription not found" }, { status: 404 });
   }
 
   const {
@@ -18,7 +48,7 @@ export async function POST() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Push subscription not found" }, { status: 404 });
   }
 
   const { data: subscriptions, error } = await supabase
@@ -48,7 +78,10 @@ export async function POST() {
   }
 
   if (sent === 0) {
-    return NextResponse.json({ error: failures[0] ?? "Failed to send test notification" }, { status: 500 });
+    return NextResponse.json(
+      { error: failures[0] ?? "Failed to send test notification" },
+      { status: 500 },
+    );
   }
 
   return NextResponse.json({
