@@ -2,6 +2,10 @@ import { createId, nowIso } from "@/lib/db/mappers";
 import { LOCAL_USER_ID } from "@/lib/db/constants";
 import { hasShiftSettings } from "@/lib/db/initLocalDb";
 import {
+  getOnboardingCompleted,
+  setOnboardingCompleted,
+} from "@/lib/onboarding/onboardingStatus";
+import {
   localLeaveStore,
   localMemoStore,
   localNotificationStore,
@@ -303,6 +307,10 @@ export async function migrateLocalUserToAuthUser(authUserId: string): Promise<vo
         syncStatus: "pending",
       });
     }
+  }
+
+  if (await getOnboardingCompleted(LOCAL_USER_ID)) {
+    await setOnboardingCompleted(authUserId);
   }
 }
 

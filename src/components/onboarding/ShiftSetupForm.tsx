@@ -48,6 +48,7 @@ export function ShiftSetupForm({ mode = "onboarding" }: ShiftSetupFormProps) {
       });
       await complete();
       router.replace("/");
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "설정을 저장하지 못했습니다.");
       setIsSaving(false);

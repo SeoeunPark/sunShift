@@ -1,4 +1,4 @@
-import { META_KEYS } from "@/lib/db/constants";
+import { LOCAL_USER_ID, META_KEYS } from "@/lib/db/constants";
 import { getMeta, setMeta } from "@/lib/db/initLocalDb";
 
 function onboardingKey(userId: string): string {
@@ -8,7 +8,19 @@ function onboardingKey(userId: string): string {
 /** Returns whether the user has finished first-run shift setup */
 export async function getOnboardingCompleted(userId: string): Promise<boolean> {
   const completed = await getMeta(onboardingKey(userId));
-  return completed === "true";
+  if (completed === "true") {
+    return true;
+  }
+
+  // Local setup finished before anonymous auth / account migration.
+  if (userId !== LOCAL_USER_ID) {
+    const localCompleted = await getMeta(onboardingKey(LOCAL_USER_ID));
+    if (localCompleted === "true") {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export async function setOnboardingCompleted(userId: string): Promise<void> {
