@@ -4,9 +4,55 @@ import { LEAVE_CANVAS_COLOR, SHIFT_CANVAS_COLORS } from "@/lib/theme/shiftCanvas
 import type { ScheduleShareInput } from "./scheduleText";
 
 const CELL_SIZE = 96;
-const HEADER_HEIGHT = 72;
+const HEADER_HEIGHT = 80;
 const PADDING = 32;
 const COLS = 7;
+const LOGO_PATH = "/icons/icon-192.png";
+const LOGO_SIZE = 52;
+
+function getExportScale(): number {
+  if (typeof window === "undefined") {
+    return 1;
+  }
+
+  return Math.min(Math.max(window.devicePixelRatio || 1, 1), 2);
+}
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.decoding = "async";
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Failed to load logo image"));
+    image.src = src;
+  });
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+        return;
+      }
+
+      try {
+        const dataUrl = canvas.toDataURL("image/png");
+        const base64 = dataUrl.split(",")[1];
+        if (!base64) {
+          reject(new Error("Failed to create image"));
+          return;
+        }
+
+        const binary = atob(base64);
+        const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+        resolve(new Blob([bytes], { type: "image/png" }));
+      } catch (error) {
+        reject(error instanceof Error ? error : new Error("Failed to create image"));
+      }
+    }, "image/png");
+  });
+}
 
 export async function createScheduleShareImage(input: ScheduleShareInput): Promise<Blob> {
   const { year, month, scheduleByDate, leaveDates } = input;
@@ -14,29 +60,46 @@ export async function createScheduleShareImage(input: ScheduleShareInput): Promi
   const rows = Math.ceil(days.length / COLS);
   const width = PADDING * 2 + COLS * CELL_SIZE;
   const height = PADDING * 2 + HEADER_HEIGHT + rows * CELL_SIZE;
+  const scale = getExportScale();
 
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = Math.round(width * scale);
+  canvas.height = Math.round(height * scale);
 
   const context = canvas.getContext("2d");
   if (!context) {
     throw new Error("Canvas is not supported");
   }
 
+  context.scale(scale, scale);
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+
+  if (typeof document !== "undefined" && "fonts" in document) {
+    await document.fonts.ready;
+  }
+
+  const logo = await loadImage(
+    typeof window !== "undefined"
+      ? new URL(LOGO_PATH, window.location.origin).toString()
+      : LOGO_PATH,
+  );
+
   context.fillStyle = "#ffffff";
   context.fillRect(0, 0, width, height);
 
+  context.drawImage(logo, PADDING, PADDING, LOGO_SIZE, LOGO_SIZE);
+
   context.fillStyle = "#171717";
-  context.font = "bold 28px system-ui, sans-serif";
-  context.fillText(`SHIFT ${formatMonthYear(year, month)}`, PADDING, PADDING + 24);
+  context.font = '700 26px "Noto Sans KR", system-ui, -apple-system, sans-serif';
+  context.fillText(formatMonthYear(year, month), PADDING + LOGO_SIZE + 14, PADDING + 30);
 
   context.fillStyle = "#737373";
-  context.font = "16px system-ui, sans-serif";
-  context.fillText("4조 교대근무표", PADDING, PADDING + 52);
+  context.font = '500 15px "Noto Sans KR", system-ui, -apple-system, sans-serif';
+  context.fillText("4조 교대근무표", PADDING + LOGO_SIZE + 14, PADDING + 54);
 
   const weekdays = getWeekdayLabels();
-  context.font = "bold 14px system-ui, sans-serif";
+  context.font = '700 14px "Noto Sans KR", system-ui, -apple-system, sans-serif';
   weekdays.forEach((label, index) => {
     const x = PADDING + index * CELL_SIZE + CELL_SIZE / 2;
     context.fillStyle = index === 0 ? "#ef4444" : index === 6 ? "#3b82f6" : "#525252";
@@ -63,15 +126,7 @@ export async function createScheduleShareImage(input: ScheduleShareInput): Promi
     });
   });
 
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        reject(new Error("Failed to create image"));
-        return;
-      }
-      resolve(blob);
-    }, "image/png");
-  });
+  return canvasToBlob(canvas);
 }
 
 function drawDayCell(
@@ -96,7 +151,7 @@ function drawDayCell(
   context.strokeRect(x + innerPadding, y + innerPadding, cellInnerSize, cellInnerSize);
 
   context.fillStyle = inCurrentMonth ? "#171717" : "#a3a3a3";
-  context.font = "bold 16px system-ui, sans-serif";
+  context.font = '700 16px "Noto Sans KR", system-ui, -apple-system, sans-serif';
   context.fillText(String(day), x + innerPadding + 8, y + innerPadding + 22);
 
   if (!inCurrentMonth || !shift) {
@@ -112,7 +167,7 @@ function drawDayCell(
   context.fillRect(x + innerPadding + 8, y + innerPadding + 30, cellInnerSize - 16, 28);
 
   context.fillStyle = colors.foreground;
-  context.font = "bold 14px system-ui, sans-serif";
+  context.font = '700 14px "Noto Sans KR", system-ui, -apple-system, sans-serif';
   context.fillText(shift.code, x + innerPadding + 16, y + innerPadding + 50);
 
   if (hasLeave) {

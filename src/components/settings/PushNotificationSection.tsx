@@ -61,10 +61,7 @@ export function PushNotificationSection() {
 
   return (
     <section className="app-card p-6">
-      <h2 className="mb-2 text-sm font-medium text-muted-foreground">Push 알림</h2>
-      <p className="mb-4 text-sm text-muted-foreground">
-        로그인 후 이 기기에서 근무·수면 Push 알림을 받습니다. 앱을 닫아도 알림이 옵니다.
-      </p>
+      <h2 className="mb-4 text-sm font-medium text-muted-foreground">Push 알림</h2>
 
       {needsPwaInstall && (
         <div className="mb-4 space-y-2 rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2.5">

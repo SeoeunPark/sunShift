@@ -8,6 +8,7 @@ import {
   type ScheduleShareInput,
 } from "@/lib/share/scheduleText";
 import {
+  canShareFiles,
   downloadBlob,
   shareScheduleContent,
   type ShareScheduleResult,
@@ -70,6 +71,14 @@ export function useShareSchedule() {
     try {
       const imageBlob = await createScheduleShareImage(input);
       const filename = `shift-${input.year}-${String(input.month).padStart(2, "0")}.png`;
+      const file = new File([imageBlob], filename, { type: "image/png" });
+
+      if (canShareFiles(file)) {
+        await navigator.share({ files: [file] });
+        setMessage("공유 메뉴에서 사진 앱에 저장할 수 있습니다.");
+        return;
+      }
+
       downloadBlob(imageBlob, filename);
       setMessage("근무표 이미지를 저장했습니다.");
     } finally {
