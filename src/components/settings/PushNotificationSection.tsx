@@ -59,6 +59,10 @@ export function PushNotificationSection() {
     }
   }
 
+  if (!isConfigured) {
+    return null;
+  }
+
   return (
     <section className="app-card p-6">
       <h2 className="mb-4 text-sm font-medium text-muted-foreground">Push 알림</h2>
@@ -83,10 +87,6 @@ export function PushNotificationSection() {
           </p>
           {isIosDevice() && <PwaNotificationGuide compact />}
         </div>
-      ) : !isConfigured ? (
-        <p className="text-sm text-muted-foreground">
-          지금은 Push 알림을 사용할 수 없습니다. 서비스 준비가 완료되면 다시 시도해 주세요.
-        </p>
       ) : !isAuthenticated ? (
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">

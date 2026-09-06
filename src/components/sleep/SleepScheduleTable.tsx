@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { Moon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatKoreanDateWithWeekday } from "@/lib/date/dateUtils";
 import { PAGE_VIEWPORT_HEIGHT } from "@/lib/layout/viewport";
 import {
   formatCompactTimeRange,
@@ -12,12 +11,10 @@ import {
   type RecommendedSleep,
   type SleepScheduleKey,
 } from "@/lib/sleep/sleepSchedule";
-import { getCyclePosition, getShiftForDate } from "@/lib/shift";
-import { formatShiftDayLabelWithTotal } from "@/lib/shift/shiftLabels";
+import { getShiftForDate } from "@/lib/shift";
 import {
   DEFAULT_SHIFT_DEFINITIONS,
   DEFAULT_SHIFT_SETTINGS,
-  getPatternById,
 } from "@/lib/shift/shiftPattern";
 import { useSeoulToday } from "@/hooks/useClientOnly";
 import { useShiftSettings } from "@/hooks/useShiftSettings";
@@ -279,13 +276,6 @@ export function SleepScheduleTable() {
   const selectedSchedule = scheduleMap.get(activeShift) ?? mainSchedules[0];
   const todayShift = getShiftForDate(today, shiftSettings);
 
-  const cycleLabel = settings
-    ? formatShiftDayLabelWithTotal(
-        getCyclePosition(today, shiftSettings),
-        getPatternById(shiftSettings.patternId),
-      )
-    : null;
-
   const workLine =
     todayShift.code !== "OFF" && todayShift.startTime && todayShift.endTime
       ? formatCompactTimeRange(todayShift.startTime, todayShift.endTime)
@@ -298,14 +288,6 @@ export function SleepScheduleTable() {
         "flex min-h-0 flex-col gap-3 overflow-y-auto overscroll-contain py-1",
       )}
     >
-      <header className="shrink-0 px-0.5 pt-0.5">
-        <h1 className="text-xl font-bold tracking-tight">꿀잠</h1>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          {formatKoreanDateWithWeekday(today)}
-          {cycleLabel ? ` · ${cycleLabel}` : ""}
-        </p>
-      </header>
-
       {isLoading ? (
         <Skeleton className="h-44 w-full shrink-0 rounded-2xl" />
       ) : todaySleep ? (
