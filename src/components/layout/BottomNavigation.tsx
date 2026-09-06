@@ -44,7 +44,7 @@ export function BottomNavigation() {
                   aria-label={label}
                   aria-current={isActive ? "page" : undefined}
                   className={cn(
-                    "flex min-h-[46px] flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1.5 text-[10px] font-medium transition-all",
+                    "flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-[10px] font-medium leading-none transition-all",
                     isActive
                       ? "bg-primary/10 text-primary shadow-sm"
                       : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
