@@ -13,6 +13,14 @@ function isAuthorized(request: Request): boolean {
 }
 
 export async function POST(request: Request) {
+  return handleCron(request);
+}
+
+export async function GET(request: Request) {
+  return handleCron(request);
+}
+
+async function handleCron(request: Request) {
   if (!isPushConfigured()) {
     return NextResponse.json({ error: "VAPID keys are not configured" }, { status: 503 });
   }
