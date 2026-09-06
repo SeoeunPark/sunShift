@@ -21,6 +21,7 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
   const { isCompleted, isLoading, reload } = useOnboardingStatus();
   const wasOnOnboardingRef = useRef(false);
   const awaitingOnboardingReloadRef = useRef(false);
+  const onboardingReloadStartedRef = useRef(false);
 
   useEffect(() => {
     if (dbReady) {
@@ -34,11 +35,12 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
 
     wasOnOnboardingRef.current = onOnboarding;
 
-    if (leftOnboarding && dbReady) {
+    if (leftOnboarding && dbReady && !isCompleted) {
       awaitingOnboardingReloadRef.current = true;
+      onboardingReloadStartedRef.current = false;
       reload();
     }
-  }, [dbReady, pathname, reload]);
+  }, [dbReady, isCompleted, pathname, reload]);
 
   useEffect(() => {
     if (!dbReady) {
@@ -46,10 +48,17 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
     }
 
     if (awaitingOnboardingReloadRef.current) {
-      if (isLoading || isCompleted === null) {
+      if (isCompleted === null) {
+        onboardingReloadStartedRef.current = true;
         return;
       }
+
+      if (!onboardingReloadStartedRef.current) {
+        return;
+      }
+
       awaitingOnboardingReloadRef.current = false;
+      onboardingReloadStartedRef.current = false;
     } else if (isLoading || isCompleted === null) {
       return;
     }

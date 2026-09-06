@@ -1,4 +1,4 @@
-const CACHE_NAME = "shift-v3";
+const CACHE_NAME = "shift-v4";
 
 const APP_SHELL = [
   "/",
@@ -117,7 +117,7 @@ self.addEventListener("push", (event) => {
   }
 
   const payload = event.data.json();
-  const title = payload.title ?? "SHIFT";
+  const title = payload.title ?? "SUN shift";
   const options = {
     body: payload.body ?? "",
     icon: "/icons/icon-192.png",

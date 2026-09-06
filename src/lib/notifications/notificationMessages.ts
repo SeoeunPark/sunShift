@@ -1,5 +1,6 @@
 import type { RecommendedSleep } from "@/lib/sleep/sleepSchedule";
 import { formatRecommendedSleep } from "@/lib/sleep/sleepSchedule";
+import { APP_DISPLAY_NAME } from "@/lib/brand/appName";
 import type { ShiftResult } from "@/lib/shift/shiftTypes";
 
 export type NotificationKind =
@@ -33,7 +34,7 @@ export function buildTodayShiftNotification(
 ): PlannedNotification {
   return {
     kind: "today_shift",
-    title: "SHIFT",
+    title: APP_DISPLAY_NAME,
     body: `${minutesBefore}분 후 ${shift.name} 근무입니다.${formatShiftTimeRange(shift)}`,
     data: { kind: "today_shift", date: shift.date },
   };
@@ -42,7 +43,7 @@ export function buildTodayShiftNotification(
 export function buildTomorrowShiftNotification(shift: ShiftResult): PlannedNotification {
   return {
     kind: "tomorrow_shift",
-    title: "SHIFT",
+    title: APP_DISPLAY_NAME,
     body: `내일은 ${shift.name} 근무입니다.${formatShiftTimeRange(shift)}`,
     data: { kind: "tomorrow_shift", date: shift.date },
   };
@@ -51,7 +52,7 @@ export function buildTomorrowShiftNotification(shift: ShiftResult): PlannedNotif
 export function buildBeforeShiftNotification(shift: ShiftResult, minutes: number): PlannedNotification {
   return {
     kind: "before_shift",
-    title: "SHIFT",
+    title: APP_DISPLAY_NAME,
     body: `${minutes}분 후 ${shift.name} 출근입니다.${formatShiftTimeRange(shift)}`,
     data: { kind: "before_shift", date: shift.date },
   };
@@ -60,7 +61,7 @@ export function buildBeforeShiftNotification(shift: ShiftResult, minutes: number
 export function buildOffDayNotification(date: string): PlannedNotification {
   return {
     kind: "off_day",
-    title: "SHIFT",
+    title: APP_DISPLAY_NAME,
     body: "오늘은 휴무입니다. 💤",
     data: { kind: "off_day", date },
   };
@@ -69,7 +70,7 @@ export function buildOffDayNotification(date: string): PlannedNotification {
 export function buildLeaveTomorrowNotification(date: string): PlannedNotification {
   return {
     kind: "leave_tomorrow",
-    title: "SHIFT",
+    title: APP_DISPLAY_NAME,
     body: "내일은 연차입니다.",
     data: { kind: "leave_tomorrow", date },
   };
@@ -81,7 +82,7 @@ export function buildSleepNotification(
 ): PlannedNotification {
   return {
     kind: "sleep",
-    title: "SHIFT",
+    title: APP_DISPLAY_NAME,
     body: `${sleep.label} 취침 1시간 전입니다. ${formatRecommendedSleep(sleep)}`,
     data: { kind: "sleep", date },
   };

@@ -1,6 +1,7 @@
 import webpush from "web-push";
 import type { PushSubscription } from "@/types/database";
 import { getVapidPublicKey, getVapidSubject, isPushConfigured } from "@/lib/push/config";
+import { APP_DISPLAY_NAME } from "@/lib/brand/appName";
 import type { PlannedNotification } from "@/lib/notifications/notificationMessages";
 import { formatWebPushError } from "@/lib/push/webPushErrors";
 
@@ -47,7 +48,7 @@ export async function sendTestPushNotification(
 ): Promise<void> {
   await sendWebPushNotification(subscription, {
     kind: "today_shift",
-    title: "SHIFT",
+    title: APP_DISPLAY_NAME,
     body: "테스트 알림입니다. Web Push가 정상 동작합니다.",
     data: { kind: "today_shift", date: new Date().toISOString().slice(0, 10) },
   });

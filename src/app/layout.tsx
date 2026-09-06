@@ -2,8 +2,10 @@ import { WidgetSyncProvider } from "@/components/widget/WidgetSyncProvider";
 import { AppShell } from "@/components/layout/AppShell";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { DbProvider } from "@/components/layout/DbProvider";
+import { OnboardingStatusProvider } from "@/components/onboarding/OnboardingStatusProvider";
 import { SyncProvider } from "@/components/layout/SyncProvider";
 import type { Metadata, Viewport } from "next";
+import { APP_DISPLAY_NAME } from "@/lib/brand/appName";
 import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 
@@ -14,13 +16,13 @@ const notoSansKr = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "SHIFT",
+  title: APP_DISPLAY_NAME,
   description: "4조 교대근무 관리 서비스",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "SHIFT",
+    title: APP_DISPLAY_NAME,
   },
   icons: {
     icon: [
@@ -59,11 +61,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       >
         <AuthProvider>
           <DbProvider>
-            <SyncProvider>
-              <AppShell>
-                <WidgetSyncProvider>{children}</WidgetSyncProvider>
-              </AppShell>
-            </SyncProvider>
+            <OnboardingStatusProvider>
+              <SyncProvider>
+                <AppShell>
+                  <WidgetSyncProvider>{children}</WidgetSyncProvider>
+                </AppShell>
+              </SyncProvider>
+            </OnboardingStatusProvider>
           </DbProvider>
         </AuthProvider>
       </body>
