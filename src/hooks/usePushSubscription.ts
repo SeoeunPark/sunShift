@@ -56,7 +56,7 @@ export function usePushSubscription() {
 
         if (!cancelled) {
           setPermission(nextPermission);
-          setIsSubscribed(Boolean(subscription) || nextPermission === "granted");
+          setIsSubscribed(Boolean(subscription));
         }
       } finally {
         if (!cancelled) {
