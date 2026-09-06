@@ -15,11 +15,11 @@ export function AppLogo({ className, href = "/" }: AppLogoProps) {
       aria-label="SUN shift 홈"
     >
       <Image
-        src="/icons/apple-touch-icon.png"
+        src="/icons/icon-192.png"
         alt=""
         width={36}
         height={36}
-        className="size-9 rounded-xl shadow-md shadow-orange-500/20"
+        className="size-9"
         priority
       />
       <span className="flex items-baseline gap-1">
