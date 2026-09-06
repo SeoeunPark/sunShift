@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,8 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 type AuthMode = "magic" | "password";
 
-export function LoginForm() {
+function LoginFormContent() {
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<AuthMode>("magic");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,6 +25,18 @@ export function LoginForm() {
   const [message, setMessage] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("error") === "auth") {
+      const detail = searchParams.get("message");
+      setMessage(
+        detail
+          ? `로그인 확인에 실패했습니다. ${detail}`
+          : "로그인 확인에 실패했습니다. 링크를 다시 요청해 주세요.",
+      );
+      setIsError(true);
+    }
+  }, [searchParams]);
 
   if (!isSupabaseConfigured()) {
     return (
@@ -155,5 +169,13 @@ export function LoginForm() {
         )}
       </CardContent>
     </Card>
+  );
+}
+
+export function LoginForm() {
+  return (
+    <Suspense fallback={null}>
+      <LoginFormContent />
+    </Suspense>
   );
 }
