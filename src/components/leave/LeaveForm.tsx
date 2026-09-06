@@ -59,28 +59,27 @@ export function LeaveForm({ initialDate = "", compact = false }: LeaveFormProps)
         <h2 className="mb-2 text-xs font-semibold text-foreground">연차 등록</h2>
 
         <form onSubmit={handleSubmit} className="space-y-2">
-          <div className="grid grid-cols-[1fr_auto] gap-1.5">
-            <Input
-              id="leave-date"
-              type="date"
-              value={date}
-              onChange={(event) => handleDateChange(event.target.value)}
-              required
-              className="h-9 text-sm"
-              suppressHydrationWarning
-            />
-            <Button type="submit" className="h-9 px-4" disabled={isSubmitting}>
-              {isSubmitting ? "..." : existing ? "수정" : "등록"}
-            </Button>
-          </div>
+          <Input
+            id="leave-date"
+            type="date"
+            value={date}
+            onChange={(event) => handleDateChange(event.target.value)}
+            required
+            className="h-9 w-full min-w-0 text-sm"
+            suppressHydrationWarning
+          />
 
           <Input
             id="leave-memo"
             value={memo}
             onChange={(event) => setMemoDraft(event.target.value)}
             placeholder="메모 (선택)"
-            className="h-9 text-sm"
+            className="h-9 w-full min-w-0 text-sm"
           />
+
+          <Button type="submit" className="h-9 w-full" disabled={isSubmitting}>
+            {isSubmitting ? "등록 중..." : existing ? "수정" : "등록"}
+          </Button>
 
           {restAnalysis && (
             <div className="app-card-inset flex flex-wrap items-center gap-x-2 gap-y-1 px-2.5 py-2 text-[11px]">

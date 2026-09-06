@@ -72,21 +72,28 @@ export function LeaveSummaryCard({ compact = false }: LeaveSummaryCardProps) {
         </div>
 
         {isEditing && (
-          <div className="relative mt-2.5 flex gap-1.5">
+          <div className="relative mt-2.5 space-y-1.5">
             <Input
               type="number"
               min={0}
               value={draftTotal}
               onChange={(event) => setDraftTotal(event.target.value)}
               aria-label="총 연차 일수"
-              className="h-8 text-sm"
+              className="h-8 w-full min-w-0 text-sm"
             />
-            <Button size="sm" className="h-8 px-3" onClick={() => void handleSaveTotal()}>
-              저장
-            </Button>
-            <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setIsEditing(false)}>
-              취소
-            </Button>
+            <div className="flex gap-1.5">
+              <Button size="sm" className="h-8 flex-1" onClick={() => void handleSaveTotal()}>
+                저장
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 flex-1"
+                onClick={() => setIsEditing(false)}
+              >
+                취소
+              </Button>
+            </div>
           </div>
         )}
       </AppCard>
