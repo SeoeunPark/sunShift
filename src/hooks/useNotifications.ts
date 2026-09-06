@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { ensureCloudNotifications } from "@/lib/notifications/ensureCloudNotifications";
 import { notificationRepository } from "@/lib/repositories";
+import { isLocalUser } from "@/lib/repositories/getUserId";
 import type {
   NotificationSettings,
   SleepSetting,
@@ -60,7 +62,12 @@ export function useNotifications() {
 
   const updateSettings = useCallback(
     async (input: UpdateNotificationSettingsInput) => {
-      const updated = await notificationRepository.updateSettings(userId, input);
+      let activeUserId = userId;
+      if (isLocalUser(activeUserId)) {
+        activeUserId = await ensureCloudNotifications();
+      }
+
+      const updated = await notificationRepository.updateSettings(activeUserId, input);
       setSettings(updated);
       return updated;
     },

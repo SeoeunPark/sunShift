@@ -111,8 +111,8 @@ export function PushNotificationSection() {
           </dl>
 
           <p className="text-xs leading-relaxed text-muted-foreground">
-            로그인 없이도 테스트 알림은 받을 수 있습니다. 자동 근무·수면 알림은 로그인 후
-            클라우드 동기화가 필요합니다.
+            Push를 켜면 이 기기가 자동 근무·수면 알림을 받도록 등록됩니다. 로그인 없이도
+            동작합니다.
           </p>
 
           {!canManagePush ? (

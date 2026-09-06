@@ -9,6 +9,7 @@ const NOTIFICATION_FLOW = [
   "홈 화면 SHIFT 아이콘으로 열기",
   "Push 알림 켜기 + 알림 허용",
   "근무 · 수면 알림에서 종류 선택",
+  "설정한 시간에 자동 알림 수신",
 ] as const;
 
 const APP_TIPS = [

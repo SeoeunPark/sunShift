@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { enableCloudPushNotifications } from "@/lib/notifications/ensureCloudNotifications";
 import {
   getLocalPushSubscription,
-  subscribeToPush,
   unsubscribeFromPush,
 } from "@/lib/push/subscription";
 import { getVapidPublicKey } from "@/lib/push/config";
@@ -76,7 +76,7 @@ export function usePushSubscription() {
     setError(null);
 
     try {
-      await subscribeToPush(userId);
+      await enableCloudPushNotifications(userId);
       setPermission("granted");
       setIsSubscribed(true);
       reload();

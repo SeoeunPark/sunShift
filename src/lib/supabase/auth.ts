@@ -92,6 +92,28 @@ export async function signUpWithPassword(
   };
 }
 
+export async function ensureCloudSession(): Promise<string | null> {
+  const supabase = getClient();
+  if (!supabase) {
+    return null;
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    return user.id;
+  }
+
+  const { data, error } = await supabase.auth.signInAnonymously();
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data.user?.id ?? null;
+}
+
 export async function signOut(): Promise<AuthResult> {
   const supabase = getClient();
   if (!supabase) {

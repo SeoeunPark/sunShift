@@ -64,6 +64,10 @@ export function NotificationSection() {
     <section className="app-card p-6">
       <h2 className="mb-3 text-xs font-semibold text-muted-foreground">근무 · 수면 알림</h2>
 
+      <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
+        위 Push 알림을 켠 뒤 받을 알림 종류를 선택하세요.
+      </p>
+
       <div className="space-y-2">
         <SettingRow
           label="오늘 근무 알림"
