@@ -70,7 +70,18 @@ export function PushNotificationSection() {
   }
 
   if (!isConfigured) {
-    return null;
+    return (
+      <section className="app-card p-6">
+        <h2 className="mb-4 text-sm font-medium text-muted-foreground">Push 알림</h2>
+        <div className="space-y-2 rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2.5">
+          <p className="text-sm font-medium text-foreground">Push 알림 준비 중</p>
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            서버에 VAPID 키가 설정되지 않아 Push 기능을 아직 사용할 수 없습니다. 배포
+            환경(Vercel)에 VAPID 환경변수를 추가한 뒤 다시 배포해 주세요.
+          </p>
+        </div>
+      </section>
+    );
   }
 
   return (
