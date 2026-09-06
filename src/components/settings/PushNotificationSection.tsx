@@ -111,10 +111,6 @@ export function PushNotificationSection() {
         <div className="space-y-3">
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">권한</dt>
-              <dd>{permission}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
               <dt className="text-muted-foreground">구독 상태</dt>
               <dd>{isSubscribed ? "활성" : "비활성"}</dd>
             </div>
