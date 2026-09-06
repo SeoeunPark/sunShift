@@ -5,7 +5,7 @@ import { DbProvider } from "@/components/layout/DbProvider";
 import { OnboardingStatusProvider } from "@/components/onboarding/OnboardingStatusProvider";
 import { SyncProvider } from "@/components/layout/SyncProvider";
 import type { Metadata, Viewport } from "next";
-import { APP_DISPLAY_NAME } from "@/lib/brand/appName";
+import { APP_DISPLAY_NAME, APP_IOS_HOME_SCREEN_NAME } from "@/lib/brand/appName";
 import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 
@@ -16,13 +16,14 @@ const notoSansKr = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: APP_DISPLAY_NAME,
+  title: APP_IOS_HOME_SCREEN_NAME,
+  applicationName: APP_DISPLAY_NAME,
   description: "4조 교대근무 관리 서비스",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: APP_DISPLAY_NAME,
+    title: APP_IOS_HOME_SCREEN_NAME,
   },
   icons: {
     icon: [

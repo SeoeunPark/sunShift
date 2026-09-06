@@ -4,7 +4,7 @@ const serverUrl = process.env.CAPACITOR_SERVER_URL;
 
 const config: CapacitorConfig = {
   appId: "com.sunshift.app",
-  appName: "SHIFT",
+  appName: "SUN shift",
   webDir: "public",
   server: serverUrl
     ? {

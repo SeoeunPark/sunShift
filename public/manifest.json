@@ -1,6 +1,6 @@
 {
   "name": "SUN shift",
-  "short_name": "SUN shift",
+  "short_name": "SUN\u00a0shift",
   "description": "4조 교대근무자를 위한 근무표, 연차, 메모, 알림 관리",
   "id": "/",
   "start_url": "/",

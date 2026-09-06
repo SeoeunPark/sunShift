@@ -5,6 +5,7 @@ import { OfflineBanner } from "@/components/pwa/OfflineBanner";
 import { BOTTOM_NAV_RESERVE } from "@/lib/layout/viewport";
 import { cn } from "@/lib/utils";
 import { BottomNavigation } from "./BottomNavigation";
+import { IosHomeScreenMeta } from "@/components/pwa/IosHomeScreenMeta";
 import { ServiceWorkerProvider } from "./ServiceWorkerProvider";
 
 interface AppShellProps {
@@ -14,6 +15,7 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   return (
     <>
+      <IosHomeScreenMeta />
       <ServiceWorkerProvider />
       <div className={cn("app-bg mx-auto flex min-h-dvh w-full max-w-lg flex-col", BOTTOM_NAV_RESERVE)}>
         <OfflineBanner />
