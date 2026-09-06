@@ -16,6 +16,15 @@ export default function SettingsPage() {
       <PushNotificationSection />
       <NotificationSection />
       <AccountSection />
+      <footer className="pb-2 text-center text-[11px] leading-relaxed text-muted-foreground/80">
+        <p>© {new Date().getFullYear()} 박서은</p>
+        <a
+          href="mailto:seoeunpark.03@gmail.com"
+          className="hover:text-foreground"
+        >
+          seoeunpark.03@gmail.com
+        </a>
+      </footer>
     </div>
   );
 }
