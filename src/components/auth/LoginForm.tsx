@@ -27,15 +27,24 @@ function LoginFormContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (searchParams.get("error") === "auth") {
-      const detail = searchParams.get("message");
-      setMessage(
-        detail
-          ? `로그인 확인에 실패했습니다. ${detail}`
-          : "로그인 확인에 실패했습니다. 링크를 다시 요청해 주세요.",
-      );
-      setIsError(true);
+    if (searchParams.get("error") !== "auth") {
+      return;
     }
+
+    const hint = searchParams.get("hint");
+    const detail = searchParams.get("message");
+
+    if (hint === "same_browser") {
+      setMessage(
+        "로그인 링크는 메일을 요청한 같은 브라우저(Safari)에서 열어야 합니다. 메일 앱 대신 Safari에서 열거나, 로그인 링크를 다시 보내 주세요.",
+      );
+    } else if (detail) {
+      setMessage(`로그인 확인에 실패했습니다. ${detail}`);
+    } else {
+      setMessage("로그인 확인에 실패했습니다. 링크를 다시 요청해 주세요.");
+    }
+
+    setIsError(true);
   }, [searchParams]);
 
   if (!isSupabaseConfigured()) {
