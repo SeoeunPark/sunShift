@@ -1,0 +1,21 @@
+# Vercel Hobby는 1일 1회 Cron만 지원합니다.
+# 근무·수면 알림은 GitHub Actions로 5분마다 호출합니다.
+# Repository → Settings → Secrets → Actions:
+#   APP_URL=https://your-app.vercel.app
+#   CRON_SECRET=(.env.local과 동일)
+
+name: Shift notifications
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch shift notifications
+        run: |
+          curl -fsS -X POST "${{ secrets.APP_URL }}/api/cron/shift-notifications" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
