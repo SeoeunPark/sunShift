@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { isAndroidDevice, isIosDevice } from "@/lib/pwa/install";
+import { PwaInstallGuide } from "@/components/pwa/PwaInstallGuide";
 import { cn } from "@/lib/utils";
 
 const NOTIFICATION_FLOW = [
@@ -58,10 +59,13 @@ export function SettingsUsageGuide() {
             {(isIosDevice() || isAndroidDevice()) && (
               <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
                 {isIosDevice()
-                  ? "iPhone: Safari에서 홈 화면 추가 후, Safari 탭이 아닌 앱 아이콘으로 열어야 Push 알림이 됩니다."
-                  : "Android: Chrome 사용과 홈 화면 추가를 권장합니다."}
+                  ? "iPhone: 잠금 화면·배너 알림. Safari 탭 ❌ → 홈 화면 앱으로 열기."
+                  : "Android: Chrome → ⋮ → 앱 설치 또는 홈 화면에 추가."}
               </p>
             )}
+            <div className="mt-3">
+              <PwaInstallGuide compact />
+            </div>
           </div>
 
           <div>

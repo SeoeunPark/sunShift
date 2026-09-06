@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PwaInstallGuide } from "@/components/pwa/PwaInstallGuide";
 import { PwaNotificationGuide } from "@/components/pwa/PwaNotificationGuide";
 import { usePwaInstall } from "@/hooks/usePwaInstall";
 import { getInstallInstructions, isAndroidDevice, isIosDevice } from "@/lib/pwa/install";
@@ -80,13 +81,15 @@ export function PwaInstallSection() {
             </div>
           )}
 
+          <PwaInstallGuide compact />
+
           <PwaNotificationGuide compact />
 
           {(isIosDevice() || isAndroidDevice()) && (
             <p className="text-[10px] leading-relaxed text-muted-foreground">
               {isIosDevice()
-                ? "iPhone은 Safari → 홈 화면 추가 후, 아이콘으로 열어야 Push 알림이 됩니다."
-                : "Android는 Chrome → 홈 화면 추가를 권장합니다."}
+                ? "iPhone 알림은 잠금 화면·배너로 옵니다. Safari 탭이 아닌 홈 화면 앱에서만 가능합니다."
+                : "Android는 Chrome → 홈 화면 추가 후 알림 센터로 받을 수 있습니다."}
             </p>
           )}
 
