@@ -31,6 +31,7 @@ export async function subscribeToPush(userId: string): Promise<PushSubscriptionP
     throw new Error("이 브라우저는 Web Push를 지원하지 않습니다.");
   }
 
+  clearPushConfigCache();
   const { configured, publicKey: vapidPublicKey } = await fetchPushConfig();
   if (!configured || !vapidPublicKey) {
     throw new Error("VAPID 공개키가 설정되지 않았습니다.");

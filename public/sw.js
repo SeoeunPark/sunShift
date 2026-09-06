@@ -1,4 +1,4 @@
-const CACHE_NAME = "shift-v2";
+const CACHE_NAME = "shift-v3";
 
 const APP_SHELL = [
   "/",

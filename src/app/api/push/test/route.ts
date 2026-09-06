@@ -32,7 +32,13 @@ export async function POST(request: Request) {
     try {
       return await sendToPayload(body);
     } catch (err) {
-      return NextResponse.json({ error: formatWebPushError(err) }, { status: 500 });
+      return NextResponse.json(
+      {
+        error: formatWebPushError(err),
+        hint: "Vercel의 VAPID_PRIVATE_KEY가 VAPID_PUBLIC_KEY와 짝이 맞는지 /api/push/verify 를 확인하세요.",
+      },
+      { status: 500 },
+    );
     }
   }
 

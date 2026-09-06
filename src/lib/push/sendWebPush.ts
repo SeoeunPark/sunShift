@@ -4,13 +4,7 @@ import { getVapidPublicKey, getVapidSubject, isPushConfigured } from "@/lib/push
 import type { PlannedNotification } from "@/lib/notifications/notificationMessages";
 import { formatWebPushError } from "@/lib/push/webPushErrors";
 
-let configured = false;
-
 function ensureWebPushConfigured(): void {
-  if (configured) {
-    return;
-  }
-
   if (!isPushConfigured()) {
     throw new Error("VAPID keys are not configured");
   }
@@ -20,7 +14,6 @@ function ensureWebPushConfigured(): void {
     getVapidPublicKey()!,
     process.env.VAPID_PRIVATE_KEY!,
   );
-  configured = true;
 }
 
 export async function sendWebPushNotification(
