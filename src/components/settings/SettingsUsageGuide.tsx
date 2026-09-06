@@ -2,16 +2,14 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { isAndroidDevice, isIosDevice } from "@/lib/pwa/install";
-import { PwaInstallGuide } from "@/components/pwa/PwaInstallGuide";
 import { cn } from "@/lib/utils";
 
 const NOTIFICATION_FLOW = [
-  "아래 「홈 화면에 추가」 펼치기 → 기기별 방법 확인",
-  "홈 화면 SHIFT 아이콘으로 앱 열기",
+  "아래 「홈 화면에 추가」에서 설치",
+  "홈 화면 SHIFT 아이콘으로 열기",
   "로그인",
-  "「Push 알림」 켜기 + 알림 허용",
-  "「근무 · 수면 알림」에서 받을 알림 선택",
+  "Push 알림 켜기 + 알림 허용",
+  "근무 · 수면 알림에서 종류 선택",
 ] as const;
 
 const APP_TIPS = [
@@ -56,16 +54,6 @@ export function SettingsUsageGuide() {
                 <li key={step}>{step}</li>
               ))}
             </ol>
-            {(isIosDevice() || isAndroidDevice()) && (
-              <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-                {isIosDevice()
-                  ? "iPhone: 잠금 화면·배너 알림. Safari 탭 ❌ → 홈 화면 앱으로 열기."
-                  : "Android: Chrome → ⋮ → 앱 설치 또는 홈 화면에 추가."}
-              </p>
-            )}
-            <div className="mt-3">
-              <PwaInstallGuide compact />
-            </div>
           </div>
 
           <div>
