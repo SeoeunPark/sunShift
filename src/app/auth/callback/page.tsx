@@ -23,9 +23,11 @@ function AuthCallbackContent() {
     const nextParam = searchParams.get("next") ?? "/settings";
     const next = nextParam.startsWith("/") ? nextParam : "/settings";
 
+    const authClient = supabase;
+
     async function finish() {
       if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        const { error } = await authClient.auth.exchangeCodeForSession(code);
         if (error) {
           const hint =
             error.message.includes("PKCE") || error.message.includes("code verifier")
@@ -37,7 +39,7 @@ function AuthCallbackContent() {
           return;
         }
       } else if (tokenHash && type) {
-        const { error } = await supabase.auth.verifyOtp({
+        const { error } = await authClient.auth.verifyOtp({
           token_hash: tokenHash,
           type,
         });
