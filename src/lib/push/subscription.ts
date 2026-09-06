@@ -44,12 +44,14 @@ export async function subscribeToPush(userId: string): Promise<PushSubscriptionP
   const registration = (await registerServiceWorker())?.registration ?? (await navigator.serviceWorker.ready);
   const existing = await registration.pushManager.getSubscription();
 
-  const subscription =
-    existing ??
-    (await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-    }));
+  if (existing) {
+    await existing.unsubscribe();
+  }
+
+  const subscription = await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+  });
 
   const payload = serializePushSubscription(subscription);
 
@@ -61,6 +63,15 @@ export async function subscribeToPush(userId: string): Promise<PushSubscriptionP
 
   if (!supabase) {
     throw new Error("Supabase가 설정되지 않았습니다.");
+  }
+
+  const { error: deleteError } = await supabase
+    .from("push_subscriptions")
+    .delete()
+    .eq("user_id", userId);
+
+  if (deleteError) {
+    throw new Error(deleteError.message);
   }
 
   const { error } = await supabase.from("push_subscriptions").upsert(
@@ -96,11 +107,7 @@ export async function unsubscribeFromPush(userId: string): Promise<void> {
 
     const supabase = createClient();
     if (supabase && !isLocalUser(userId)) {
-      await supabase
-        .from("push_subscriptions")
-        .delete()
-        .eq("user_id", userId)
-        .eq("endpoint", endpoint);
+      await supabase.from("push_subscriptions").delete().eq("user_id", userId);
     }
   }
 }

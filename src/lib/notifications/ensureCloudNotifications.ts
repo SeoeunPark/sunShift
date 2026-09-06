@@ -1,41 +1,10 @@
 import { isLocalUser } from "@/lib/repositories/getUserId";
-import {
-  getPushSubscriptionPayload,
-  subscribeToPush,
-} from "@/lib/push/subscription";
+import { subscribeToPush } from "@/lib/push/subscription";
 import { ensureCloudSession } from "@/lib/supabase/auth";
-import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { onLogin } from "@/lib/sync";
 
-async function syncExistingPushSubscription(userId: string): Promise<void> {
-  const payload = await getPushSubscriptionPayload();
-  if (!payload || isLocalUser(userId)) {
-    return;
-  }
-
-  const supabase = createClient();
-  if (!supabase) {
-    return;
-  }
-
-  const { error } = await supabase.from("push_subscriptions").upsert(
-    {
-      user_id: userId,
-      endpoint: payload.endpoint,
-      p256dh: payload.p256dh,
-      auth: payload.auth,
-      user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
-    },
-    { onConflict: "user_id,endpoint" },
-  );
-
-  if (error) {
-    throw new Error(error.message);
-  }
-}
-
-/** Create a cloud session if needed, migrate local data, and sync push settings. */
+/** Create a cloud session if needed and migrate local data. */
 export async function ensureCloudNotifications(): Promise<string> {
   if (!isSupabaseConfigured()) {
     throw new Error("Supabase가 설정되지 않았습니다.");
@@ -47,7 +16,6 @@ export async function ensureCloudNotifications(): Promise<string> {
   }
 
   await onLogin(userId);
-  await syncExistingPushSubscription(userId);
 
   return userId;
 }
