@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { LoadingCard } from "@/components/ui/LoadingCard";
 import { useDbReady } from "@/components/layout/DbProvider";
@@ -19,6 +19,8 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const dbReady = useDbReady();
   const { isCompleted, isLoading, reload } = useOnboardingStatus();
+  const wasOnOnboardingRef = useRef(false);
+  const awaitingOnboardingReloadRef = useRef(false);
 
   useEffect(() => {
     if (dbReady) {
@@ -27,7 +29,28 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
   }, [dbReady, reload]);
 
   useEffect(() => {
-    if (!dbReady || isLoading || isCompleted === null) {
+    const onOnboarding = pathname === "/onboarding" || pathname.startsWith("/onboarding/");
+    const leftOnboarding = wasOnOnboardingRef.current && !onOnboarding;
+
+    wasOnOnboardingRef.current = onOnboarding;
+
+    if (leftOnboarding && dbReady) {
+      awaitingOnboardingReloadRef.current = true;
+      reload();
+    }
+  }, [dbReady, pathname, reload]);
+
+  useEffect(() => {
+    if (!dbReady) {
+      return;
+    }
+
+    if (awaitingOnboardingReloadRef.current) {
+      if (isLoading || isCompleted === null) {
+        return;
+      }
+      awaitingOnboardingReloadRef.current = false;
+    } else if (isLoading || isCompleted === null) {
       return;
     }
 

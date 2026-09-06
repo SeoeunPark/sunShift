@@ -35,6 +35,7 @@ export function useOnboardingStatus() {
   }, [userId]);
 
   const reload = useCallback(() => {
+    setIsCompleted(null);
     setReloadToken((value) => value + 1);
   }, []);
 
