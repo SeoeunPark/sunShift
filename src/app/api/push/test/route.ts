@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isPushConfigured } from "@/lib/push/config";
 import type { PushSubscriptionPayload } from "@/lib/push/subscription";
 import { sendTestPushNotification } from "@/lib/push/sendWebPush";
+import { formatWebPushError } from "@/lib/push/webPushErrors";
 
 function isValidPayload(body: unknown): body is PushSubscriptionPayload {
   if (!body || typeof body !== "object") {
@@ -31,10 +32,7 @@ export async function POST(request: Request) {
     try {
       return await sendToPayload(body);
     } catch (err) {
-      return NextResponse.json(
-        { error: err instanceof Error ? err.message : "Failed to send test notification" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: formatWebPushError(err) }, { status: 500 });
     }
   }
 
@@ -72,7 +70,7 @@ export async function POST(request: Request) {
       await sendTestPushNotification(subscription);
       sent += 1;
     } catch (err) {
-      failures.push(err instanceof Error ? err.message : "Unknown error");
+      failures.push(formatWebPushError(err));
       await supabase.from("push_subscriptions").delete().eq("id", subscription.id);
     }
   }

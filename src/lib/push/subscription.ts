@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import { fetchPushConfig } from "@/lib/push/clientConfig";
+import { fetchPushConfig, clearPushConfigCache } from "@/lib/push/clientConfig";
 import { isLocalUser } from "@/lib/repositories/getUserId";
 import { urlBase64ToUint8Array } from "@/lib/push/vapid";
 import { isPushSupported, registerServiceWorker } from "@/lib/pwa/registerServiceWorker";
@@ -92,6 +92,7 @@ export async function unsubscribeFromPush(userId: string): Promise<void> {
   if (subscription) {
     const endpoint = subscription.endpoint;
     await subscription.unsubscribe();
+    clearPushConfigCache();
 
     const supabase = createClient();
     if (supabase && !isLocalUser(userId)) {

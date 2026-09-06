@@ -2,6 +2,7 @@ import webpush from "web-push";
 import type { PushSubscription } from "@/types/database";
 import { getVapidPublicKey, getVapidSubject, isPushConfigured } from "@/lib/push/config";
 import type { PlannedNotification } from "@/lib/notifications/notificationMessages";
+import { formatWebPushError } from "@/lib/push/webPushErrors";
 
 let configured = false;
 
@@ -28,20 +29,24 @@ export async function sendWebPushNotification(
 ): Promise<void> {
   ensureWebPushConfigured();
 
-  await webpush.sendNotification(
-    {
-      endpoint: subscription.endpoint,
-      keys: {
-        p256dh: subscription.p256dh,
-        auth: subscription.auth,
+  try {
+    await webpush.sendNotification(
+      {
+        endpoint: subscription.endpoint,
+        keys: {
+          p256dh: subscription.p256dh,
+          auth: subscription.auth,
+        },
       },
-    },
-    JSON.stringify({
-      title: notification.title,
-      body: notification.body,
-      data: notification.data,
-    }),
-  );
+      JSON.stringify({
+        title: notification.title,
+        body: notification.body,
+        data: notification.data,
+      }),
+    );
+  } catch (error) {
+    throw new Error(formatWebPushError(error));
+  }
 }
 
 export async function sendTestPushNotification(
