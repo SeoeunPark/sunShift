@@ -11,7 +11,7 @@ function padBuffer(buffer: Buffer, targetLength: number): Buffer {
 
 export function verifyVapidKeyPair(): boolean {
   const publicKey = getVapidPublicKey();
-  const privateKey = process.env.VAPID_PRIVATE_KEY;
+  const privateKey = process.env.VAPID_PRIVATE_KEY?.trim();
 
   if (!publicKey || !privateKey) {
     return false;

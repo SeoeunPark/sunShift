@@ -12,7 +12,7 @@ function ensureWebPushConfigured(): void {
   webpush.setVapidDetails(
     getVapidSubject(),
     getVapidPublicKey()!,
-    process.env.VAPID_PRIVATE_KEY!,
+    process.env.VAPID_PRIVATE_KEY!.trim(),
   );
 }
 
