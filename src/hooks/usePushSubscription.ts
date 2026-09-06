@@ -6,7 +6,7 @@ import {
   getLocalPushSubscription,
   unsubscribeFromPush,
 } from "@/lib/push/subscription";
-import { getVapidPublicKey } from "@/lib/push/config";
+import { fetchPushConfig } from "@/lib/push/clientConfig";
 import { isPushSupported } from "@/lib/pwa/registerServiceWorker";
 import { resolveUserId } from "@/lib/repositories/getUserId";
 import { useAuth } from "@/stores/authStore";
@@ -14,6 +14,7 @@ import { useAuth } from "@/stores/authStore";
 export function usePushSubscription() {
   const { user } = useAuth();
   const userId = resolveUserId(user?.id);
+  const [isConfigured, setIsConfigured] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +23,6 @@ export function usePushSubscription() {
   const [reloadToken, setReloadToken] = useState(0);
 
   const isSupported = isPushSupported();
-  const isConfigured = Boolean(getVapidPublicKey());
 
   useEffect(() => {
     let cancelled = false;
@@ -32,6 +32,11 @@ export function usePushSubscription() {
       setError(null);
 
       try {
+        const pushConfig = await fetchPushConfig();
+        if (!cancelled) {
+          setIsConfigured(pushConfig.configured);
+        }
+
         if (!isSupported) {
           if (!cancelled) {
             setIsSubscribed(false);

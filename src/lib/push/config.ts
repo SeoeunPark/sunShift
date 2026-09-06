@@ -1,5 +1,6 @@
+/** Server-only VAPID config (never use NEXT_PUBLIC_ — public key is served via /api/push/config). */
 export function getVapidPublicKey(): string | null {
-  return process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? process.env.VAPID_PUBLIC_KEY ?? null;
+  return process.env.VAPID_PUBLIC_KEY ?? null;
 }
 
 export function isPushConfigured(): boolean {

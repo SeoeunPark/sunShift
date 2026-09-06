@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
+import { fetchPushConfig } from "@/lib/push/clientConfig";
 import { isLocalUser } from "@/lib/repositories/getUserId";
-import { getVapidPublicKey } from "@/lib/push/config";
 import { urlBase64ToUint8Array } from "@/lib/push/vapid";
 import { isPushSupported, registerServiceWorker } from "@/lib/pwa/registerServiceWorker";
 
@@ -31,8 +31,8 @@ export async function subscribeToPush(userId: string): Promise<PushSubscriptionP
     throw new Error("이 브라우저는 Web Push를 지원하지 않습니다.");
   }
 
-  const vapidPublicKey = getVapidPublicKey();
-  if (!vapidPublicKey) {
+  const { configured, publicKey: vapidPublicKey } = await fetchPushConfig();
+  if (!configured || !vapidPublicKey) {
     throw new Error("VAPID 공개키가 설정되지 않았습니다.");
   }
 
