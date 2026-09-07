@@ -3,17 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingCard } from "@/components/ui/LoadingCard";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { useShiftSettings } from "@/hooks/useShiftSettings";
+import {
+  formatGroupPresetLongLabel,
+  getGroupShiftPreset,
+  GROUP_NUMBERS,
+  isGroupNumber,
+} from "@/lib/shift/groupPresets";
 import { DEFAULT_SHIFT_SETTINGS } from "@/lib/shift/shiftPattern";
-import type { ShiftCode } from "@/lib/shift/shiftTypes";
 import { cn } from "@/lib/utils";
-
-const GROUP_OPTIONS = [1, 2, 3, 4] as const;
-const SHIFT_OPTIONS: ShiftCode[] = ["A", "B", "C"];
 
 interface ShiftSetupFormProps {
   mode?: "onboarding" | "edit";
@@ -25,26 +26,35 @@ export function ShiftSetupForm({ mode = "onboarding" }: ShiftSetupFormProps) {
   const { complete } = useOnboardingStatus();
   const defaults = settings ?? DEFAULT_SHIFT_SETTINGS;
 
-  const [groupNumber, setGroupNumber] = useState<number | null>(null);
-  const [baseDate, setBaseDate] = useState<string | null>(null);
-  const [baseShift, setBaseShift] = useState<ShiftCode | null>(null);
+  const [groupNumber, setGroupNumber] = useState<number | null>(
+    mode === "edit" && isGroupNumber(defaults.groupNumber) ? defaults.groupNumber : null,
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const resolvedGroup = groupNumber ?? defaults.groupNumber;
-  const resolvedDate = baseDate ?? defaults.baseDate;
-  const resolvedShift = baseShift ?? defaults.baseShift;
+  const resolvedGroup = groupNumber;
+  const selectedPreset =
+    resolvedGroup !== null && isGroupNumber(resolvedGroup)
+      ? getGroupShiftPreset(resolvedGroup)
+      : null;
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
+
+    if (resolvedGroup === null || !isGroupNumber(resolvedGroup)) {
+      setError("몇 조인지 선택해 주세요.");
+      return;
+    }
+
+    const preset = getGroupShiftPreset(resolvedGroup);
     setIsSaving(true);
 
     try {
       await save({
-        groupNumber: resolvedGroup,
-        baseDate: resolvedDate,
-        baseShift: resolvedShift,
+        groupNumber: preset.groupNumber,
+        baseDate: preset.baseDate,
+        baseShift: preset.baseShift,
       });
       await complete();
       router.replace("/");
@@ -62,16 +72,16 @@ export function ShiftSetupForm({ mode = "onboarding" }: ShiftSetupFormProps) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <section className="rounded-2xl border bg-card p-6 shadow-sm">
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label htmlFor="group-number">몇 조인가요?</Label>
-          <div className="grid grid-cols-4 gap-2">
-            {GROUP_OPTIONS.map((value) => (
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {GROUP_NUMBERS.map((value) => (
               <button
                 key={value}
                 type="button"
                 onClick={() => setGroupNumber(value)}
                 className={cn(
-                  "h-11 rounded-xl border text-sm font-medium transition-colors active:scale-[0.98]",
+                  "h-14 rounded-xl border px-2 text-sm font-medium transition-colors active:scale-[0.98]",
                   resolvedGroup === value
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border bg-background hover:bg-muted",
@@ -81,43 +91,15 @@ export function ShiftSetupForm({ mode = "onboarding" }: ShiftSetupFormProps) {
               </button>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="rounded-2xl border bg-card p-6 shadow-sm space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="base-date">기준일은 언제인가요?</Label>
-          <Input
-            id="base-date"
-            type="date"
-            value={resolvedDate}
-            onChange={(event) => setBaseDate(event.target.value)}
-            required
-          />
-          <p className="text-xs text-muted-foreground">
-            교대 패턴 계산의 시작점이 되는 날짜입니다.
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          <Label>기준일에 무슨 조였나요?</Label>
-          <div className="grid grid-cols-3 gap-2">
-            {SHIFT_OPTIONS.map((code) => (
-              <button
-                key={code}
-                type="button"
-                onClick={() => setBaseShift(code)}
-                className={cn(
-                  "h-11 rounded-xl border text-sm font-medium transition-colors active:scale-[0.98]",
-                  resolvedShift === code
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background hover:bg-muted",
-                )}
-              >
-                {code}조
-              </button>
-            ))}
-          </div>
+          {selectedPreset ? (
+            <p className="text-sm text-muted-foreground">
+              {formatGroupPresetLongLabel(selectedPreset.groupNumber)}
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              조를 선택하면 2026년 9월 교대 시작 정보가 자동으로 적용됩니다.
+            </p>
+          )}
         </div>
       </section>
 
@@ -143,7 +125,11 @@ export function ShiftSetupForm({ mode = "onboarding" }: ShiftSetupFormProps) {
         </p>
       ) : null}
 
-      <Button type="submit" className="h-12 w-full text-base" disabled={isSaving}>
+      <Button
+        type="submit"
+        className="h-12 w-full text-base"
+        disabled={isSaving || resolvedGroup === null}
+      >
         {isSaving ? "저장 중..." : mode === "edit" ? "설정 저장" : "시작하기"}
       </Button>
     </form>

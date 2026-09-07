@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_SHIFT_SETTINGS } from "@/lib/shift/shiftPattern";
+import { LEGACY_TEST_SHIFT_SETTINGS } from "@/lib/shift/__tests__/fixtures";
 import type { NotificationSettings } from "@/types/local";
 import {
   getPreDayWorkNotifyTime,
@@ -32,7 +32,7 @@ describe("planNotifications", () => {
     const planned = planNotifications({
       now: new Date("2026-09-02T14:00:00+09:00"),
       settings: baseSettings(),
-      shiftSettings: DEFAULT_SHIFT_SETTINGS,
+      shiftSettings: LEGACY_TEST_SHIFT_SETTINGS,
       leaveDates: [],
     });
 
@@ -46,7 +46,7 @@ describe("planNotifications", () => {
     const planned = planNotifications({
       now: new Date("2026-09-01T06:00:00+09:00"),
       settings: baseSettings(),
-      shiftSettings: DEFAULT_SHIFT_SETTINGS,
+      shiftSettings: LEGACY_TEST_SHIFT_SETTINGS,
       leaveDates: [],
     });
 
@@ -57,7 +57,7 @@ describe("planNotifications", () => {
     const planned = planNotifications({
       now: new Date("2026-09-01T20:00:00+09:00"),
       settings: baseSettings(),
-      shiftSettings: DEFAULT_SHIFT_SETTINGS,
+      shiftSettings: LEGACY_TEST_SHIFT_SETTINGS,
       leaveDates: [],
     });
 
@@ -84,7 +84,7 @@ describe("planNotifications", () => {
     const planned = planNotifications({
       now: new Date("2026-09-02T14:00:00+09:00"),
       settings: baseSettings(),
-      shiftSettings: DEFAULT_SHIFT_SETTINGS,
+      shiftSettings: LEGACY_TEST_SHIFT_SETTINGS,
       leaveDates: ["2026-09-02"],
     });
 

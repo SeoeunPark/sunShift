@@ -1,4 +1,5 @@
 import type { ShiftDefinition, ShiftPattern, ShiftSettings } from "./shiftTypes";
+import { getGroupShiftPreset } from "./groupPresets";
 
 /** Default 4-group 6-work-2-off pattern (24-day cycle) */
 export const DEFAULT_FOUR_GROUP_PATTERN: ShiftPattern = {
@@ -56,11 +57,13 @@ export const DEFAULT_SHIFT_DEFINITIONS: ShiftDefinition[] = [
   },
 ];
 
-/** Default shift settings: 2026-09-02 = B조 */
+/** Default shift settings before onboarding: 4조 · C조 9/10 시작 */
+const defaultGroupPreset = getGroupShiftPreset(4);
+
 export const DEFAULT_SHIFT_SETTINGS: ShiftSettings = {
-  groupNumber: 4,
-  baseDate: "2026-09-02",
-  baseShift: "B",
+  groupNumber: defaultGroupPreset.groupNumber,
+  baseDate: defaultGroupPreset.baseDate,
+  baseShift: defaultGroupPreset.baseShift,
   patternId: DEFAULT_FOUR_GROUP_PATTERN.id,
   shiftDefinitions: DEFAULT_SHIFT_DEFINITIONS,
 };

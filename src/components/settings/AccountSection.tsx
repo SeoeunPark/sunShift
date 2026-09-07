@@ -9,6 +9,7 @@ import { LoadingCard } from "@/components/ui/LoadingCard";
 import { useShiftSettings } from "@/hooks/useShiftSettings";
 import { signOut } from "@/lib/supabase/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { formatGroupPresetLongLabel, isGroupNumber } from "@/lib/shift/groupPresets";
 import { DEFAULT_SHIFT_SETTINGS } from "@/lib/shift/shiftPattern";
 import { useAuth } from "@/stores/authStore";
 
@@ -37,17 +38,13 @@ export function AccountSection() {
         ) : (
           <>
             <dl className="space-y-3 text-sm">
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-4">
                 <dt className="text-muted-foreground">내 조</dt>
-                <dd>{shiftSettings.groupNumber}조</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">기준일</dt>
-                <dd>{shiftSettings.baseDate}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">기준일 근무</dt>
-                <dd>{shiftSettings.baseShift}조</dd>
+                <dd className="text-right">
+                  {isGroupNumber(shiftSettings.groupNumber)
+                    ? formatGroupPresetLongLabel(shiftSettings.groupNumber)
+                    : `${shiftSettings.groupNumber}조`}
+                </dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">근무 패턴</dt>

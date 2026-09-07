@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_SHIFT_SETTINGS } from "@/lib/shift/shiftPattern";
+import { LEGACY_TEST_SHIFT_SETTINGS } from "@/lib/shift/__tests__/fixtures";
 import { planSleepNotifications } from "../sleepPlanner";
 
 describe("planSleepNotifications", () => {
@@ -7,7 +7,7 @@ describe("planSleepNotifications", () => {
     const planned = planSleepNotifications({
       now: new Date("2026-09-02T00:00:00+09:00"),
       sleepEnabled: true,
-      shiftSettings: DEFAULT_SHIFT_SETTINGS,
+      shiftSettings: LEGACY_TEST_SHIFT_SETTINGS,
       leaveDates: [],
     });
 
@@ -21,7 +21,7 @@ describe("planSleepNotifications", () => {
     const planned = planSleepNotifications({
       now: new Date("2026-09-01T20:00:00+09:00"),
       sleepEnabled: true,
-      shiftSettings: DEFAULT_SHIFT_SETTINGS,
+      shiftSettings: LEGACY_TEST_SHIFT_SETTINGS,
       leaveDates: [],
     });
 
@@ -32,7 +32,7 @@ describe("planSleepNotifications", () => {
     const planned = planSleepNotifications({
       now: new Date("2026-09-02T00:00:00+09:00"),
       sleepEnabled: false,
-      shiftSettings: DEFAULT_SHIFT_SETTINGS,
+      shiftSettings: LEGACY_TEST_SHIFT_SETTINGS,
       leaveDates: [],
     });
 
@@ -43,7 +43,7 @@ describe("planSleepNotifications", () => {
     const planned = planSleepNotifications({
       now: new Date("2026-09-02T00:00:00+09:00"),
       sleepEnabled: true,
-      shiftSettings: DEFAULT_SHIFT_SETTINGS,
+      shiftSettings: LEGACY_TEST_SHIFT_SETTINGS,
       leaveDates: ["2026-09-02"],
     });
 

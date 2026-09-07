@@ -15,8 +15,8 @@ function OnboardingContent() {
         title={isEdit ? "교대 설정" : "내 교대 설정"}
         description={
           isEdit
-            ? "조 번호, 기준일, 기준 근무조를 수정할 수 있습니다."
-            : "교대 패턴 계산을 위해 아래 정보를 확인해 주세요."
+            ? "조 번호만 선택하면 교대 시작 정보가 자동으로 적용됩니다."
+            : "몇 조인지만 선택해 주세요. 교대 시작 정보는 앱에 저장되어 있습니다."
         }
       />
       <ShiftSetupForm mode={isEdit ? "edit" : "onboarding"} />

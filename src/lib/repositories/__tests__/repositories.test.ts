@@ -19,8 +19,8 @@ describe("ShiftSettingsRepository", () => {
   it("seeds and returns default shift settings for local user", async () => {
     const settings = await shiftSettingsRepository.get(LOCAL_USER_ID);
 
-    expect(settings.baseDate).toBe("2026-09-02");
-    expect(settings.baseShift).toBe("B");
+    expect(settings.baseDate).toBe("2026-09-10");
+    expect(settings.baseShift).toBe("C");
     expect(settings.groupNumber).toBe(4);
     expect(settings.shiftDefinitions).toHaveLength(4);
   });

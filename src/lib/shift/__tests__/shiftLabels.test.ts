@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { getCyclePosition } from "@/lib/shift/shiftCalculator";
-import { DEFAULT_SHIFT_SETTINGS } from "@/lib/shift/shiftPattern";
+import { getPatternById } from "@/lib/shift/shiftPattern";
 import {
   formatShiftDayLabel,
   formatShiftDayLabelWithTotal,
 } from "@/lib/shift/shiftLabels";
-import { getPatternById } from "@/lib/shift/shiftPattern";
+import { LEGACY_TEST_SHIFT_SETTINGS } from "./fixtures";
 
-const settings = DEFAULT_SHIFT_SETTINGS;
+const settings = LEGACY_TEST_SHIFT_SETTINGS;
 const pattern = getPatternById(settings.patternId);
 
 describe("formatShiftDayLabel", () => {

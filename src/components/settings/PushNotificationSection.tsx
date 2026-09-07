@@ -67,7 +67,7 @@ export function PushNotificationSection() {
     }
   }
 
-  if (!isConfigured) {
+  if (isConfigured === false) {
     return (
       <section className="app-card p-6">
         <h2 className="mb-4 text-sm font-medium text-muted-foreground">Push 알림</h2>
@@ -98,9 +98,7 @@ export function PushNotificationSection() {
         </div>
       )}
 
-      {isLoading ? (
-        <p className="text-sm text-muted-foreground">Push 상태 확인 중...</p>
-      ) : !isSupported ? (
+      {!isSupported ? (
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">
             이 브라우저는 Web Push를 지원하지 않습니다.
@@ -125,7 +123,7 @@ export function PushNotificationSection() {
             <Button
               className="w-full"
               onClick={() => void handleSubscribe()}
-              disabled={isWorking || needsPwaInstall}
+              disabled={isWorking || needsPwaInstall || isLoading}
             >
               {isWorking ? "구독 중..." : permission === "granted" ? "Push 알림 다시 켜기" : "Push 알림 켜기"}
             </Button>
@@ -134,7 +132,7 @@ export function PushNotificationSection() {
               <Button
                 className="w-full"
                 onClick={() => void handleTestNotification()}
-                disabled={isWorking}
+                disabled={isWorking || isLoading}
               >
                 테스트 알림 보내기
               </Button>
@@ -142,7 +140,7 @@ export function PushNotificationSection() {
                 variant="destructive"
                 className="w-full"
                 onClick={() => void handleUnsubscribe()}
-                disabled={isWorking}
+                disabled={isWorking || isLoading}
               >
                 Push 알림 끄기
               </Button>

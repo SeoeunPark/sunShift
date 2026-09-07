@@ -73,8 +73,8 @@ describe("mapShiftSettingsToRow", () => {
       id: "settings-1",
       user_id: "user-1",
       group_number: 4,
-      base_date: "2026-09-02",
-      base_shift: "B",
+      base_date: "2026-09-10",
+      base_shift: "C",
       pattern_id: "four-group-6-2",
     });
   });

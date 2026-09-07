@@ -12,9 +12,9 @@ import {
   getRestPeriodAroundLeave,
   getShiftForDate,
 } from "../shiftCalculator";
-import { DEFAULT_SHIFT_SETTINGS } from "../shiftPattern";
+import { LEGACY_TEST_SHIFT_SETTINGS } from "./fixtures";
 
-const settings = DEFAULT_SHIFT_SETTINGS;
+const settings = LEGACY_TEST_SHIFT_SETTINGS;
 
 describe("getShiftForDate - required test cases", () => {
   const cases: Array<[string, string]> = [
