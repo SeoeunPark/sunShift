@@ -95,11 +95,7 @@ export function ShiftSetupForm({ mode = "onboarding" }: ShiftSetupFormProps) {
             <p className="text-sm text-muted-foreground">
               {formatGroupPresetLongLabel(selectedPreset.groupNumber)}
             </p>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              조를 선택하면 2026년 9월 교대 시작 정보가 자동으로 적용됩니다.
-            </p>
-          )}
+          ) : null}
         </div>
       </section>
 
