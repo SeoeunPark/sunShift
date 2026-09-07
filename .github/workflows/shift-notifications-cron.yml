@@ -1,8 +1,9 @@
 # Vercel Hobby는 1일 1회 Cron만 지원합니다.
 # 근무·수면 알림은 GitHub Actions로 5분마다 호출합니다.
-# Repository → Settings → Secrets → Actions:
-#   APP_URL=https://your-app.vercel.app
-#   CRON_SECRET=(.env.local과 동일)
+#
+# Repository → Settings → Secrets and variables → Actions:
+#   APP_URL     = https://sun-shift.vercel.app   (따옴표·슬래시(/) 없이)
+#   CRON_SECRET = Vercel CRON_SECRET과 동일       (줄바꿈 없이)
 
 name: Shift notifications
 
@@ -16,6 +17,43 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Dispatch shift notifications
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -fsS -X POST "${{ secrets.APP_URL }}/api/cron/shift-notifications" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+          set -euo pipefail
+
+          trim() {
+            printf '%s' "$1" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+          }
+
+          APP_URL="$(trim "${APP_URL:-}")"
+          CRON_SECRET="$(trim "${CRON_SECRET:-}")"
+          APP_URL="${APP_URL%/}"
+          APP_URL="${APP_URL#\"}"
+          APP_URL="${APP_URL%\"}"
+
+          if [ -z "$APP_URL" ]; then
+            echo "::error::APP_URL secret is missing. Set it to https://sun-shift.vercel.app"
+            exit 1
+          fi
+
+          case "$APP_URL" in
+            http://*|https://*) ;;
+            *)
+              echo "::error::APP_URL must start with http:// or https:// (got: $APP_URL)"
+              exit 1
+              ;;
+          esac
+
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::CRON_SECRET secret is missing."
+            exit 1
+          fi
+
+          echo "Calling ${APP_URL}/api/cron/shift-notifications"
+
+          response="$(curl -fsS -X POST "${APP_URL}/api/cron/shift-notifications" \
+            -H "Authorization: Bearer ${CRON_SECRET}")"
+
+          echo "$response"
