@@ -8,7 +8,6 @@ import { LoadingCard } from "@/components/ui/LoadingCard";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { useShiftSettings } from "@/hooks/useShiftSettings";
 import {
-  formatGroupPresetLongLabel,
   getGroupShiftPreset,
   GROUP_NUMBERS,
   isGroupNumber,
@@ -33,10 +32,6 @@ export function ShiftSetupForm({ mode = "onboarding" }: ShiftSetupFormProps) {
   const [error, setError] = useState<string | null>(null);
 
   const resolvedGroup = groupNumber;
-  const selectedPreset =
-    resolvedGroup !== null && isGroupNumber(resolvedGroup)
-      ? getGroupShiftPreset(resolvedGroup)
-      : null;
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -91,11 +86,6 @@ export function ShiftSetupForm({ mode = "onboarding" }: ShiftSetupFormProps) {
               </button>
             ))}
           </div>
-          {selectedPreset ? (
-            <p className="text-sm text-muted-foreground">
-              {formatGroupPresetLongLabel(selectedPreset.groupNumber)}
-            </p>
-          ) : null}
         </div>
       </section>
 
