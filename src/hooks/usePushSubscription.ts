@@ -10,6 +10,7 @@ import { fetchPushConfig } from "@/lib/push/clientConfig";
 import {
   getPushSubscriptionSnapshot,
   setPushSubscriptionSnapshot,
+  type PushSubscriptionSnapshot,
 } from "@/lib/push/pushSubscriptionCache";
 import { isPushSupported } from "@/lib/pwa/registerServiceWorker";
 import { resolveUserId } from "@/lib/repositories/getUserId";
