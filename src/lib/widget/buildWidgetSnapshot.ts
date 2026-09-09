@@ -4,7 +4,7 @@ import {
   formatCompactSleepRange,
   formatCompactTimeRange,
   formatRecommendedSleep,
-  getRecommendedSleepForDate,
+  getRecommendedSleepNow,
 } from "@/lib/sleep/sleepSchedule";
 import {
   getCyclePosition,
@@ -54,14 +54,15 @@ function findNextWorkDay(today: string, settings: ShiftSettings) {
 
 export function buildWidgetSnapshot(
   settings: ShiftSettings = DEFAULT_SHIFT_SETTINGS,
-  options?: { today?: string; origin?: string },
+  options?: { today?: string; now?: Date; origin?: string },
 ): WidgetSnapshot {
   const today = options?.today ?? getTodaySeoul();
+  const now = options?.now ?? new Date();
   const origin = options?.origin ?? "";
   const pattern = getPatternById(settings.patternId);
   const todayShift = getShiftForDate(today, settings);
   const cyclePosition = getCyclePosition(today, settings);
-  const sleep = getRecommendedSleepForDate(today, settings);
+  const sleep = getRecommendedSleepNow(now, settings);
   const nextOffDate = getNextOffDate(today, settings);
   const daysUntilOff = getDaysUntilNextOff(today, settings);
   const nextWork = findNextWorkDay(today, settings);

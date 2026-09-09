@@ -6,15 +6,20 @@ import {
   toNotificationSettings,
   toShiftSettings,
 } from "@/lib/db/mappers";
+import { getSeoulDateTimeParts } from "@/lib/notifications/notificationPlanner";
 import { planNotifications } from "@/lib/notifications/notificationPlanner";
 import { planSleepNotifications } from "@/lib/notifications/sleepPlanner";
+import type { PlannedNotification } from "@/lib/notifications/notificationMessages";
 import { sendWebPushNotification } from "@/lib/push/sendWebPush";
 import { DEFAULT_SHIFT_SETTINGS } from "@/lib/shift/shiftPattern";
 import type { ShiftSettings } from "@/lib/shift/shiftTypes";
 
 interface ShiftNotificationRunResult {
+  seoulDate: string;
+  seoulTime: string;
   usersProcessed: number;
   notificationsSent: number;
+  notificationsSkipped: number;
   failures: number;
 }
 
@@ -39,11 +44,56 @@ async function loadShiftSettings(userId: string): Promise<ShiftSettings> {
   return toShiftSettings(fromRemoteShiftSettings(settingsRow, definitions ?? []));
 }
 
+async function wasNotificationAlreadySent(
+  userId: string,
+  notification: PlannedNotification,
+): Promise<boolean> {
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from("notification_dispatches")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("kind", notification.kind)
+    .eq("reference_date", notification.data.date)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return Boolean(data);
+}
+
+async function recordNotificationSent(
+  userId: string,
+  notification: PlannedNotification,
+): Promise<void> {
+  const supabase = createAdminClient();
+
+  const { error } = await supabase.from("notification_dispatches").upsert(
+    {
+      user_id: userId,
+      kind: notification.kind,
+      reference_date: notification.data.date,
+    },
+    { onConflict: "user_id,kind,reference_date", ignoreDuplicates: true },
+  );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function runShiftNotificationDispatch(now = new Date()): Promise<ShiftNotificationRunResult> {
   const supabase = createAdminClient();
+  const { date: seoulDate, time: seoulTime } = getSeoulDateTimeParts(now);
   const result: ShiftNotificationRunResult = {
+    seoulDate,
+    seoulTime,
     usersProcessed: 0,
     notificationsSent: 0,
+    notificationsSkipped: 0,
     failures: 0,
   };
 
@@ -96,10 +146,18 @@ export async function runShiftNotificationDispatch(now = new Date()): Promise<Sh
     }
 
     for (const notification of planned) {
+      if (await wasNotificationAlreadySent(userId, notification)) {
+        result.notificationsSkipped += 1;
+        continue;
+      }
+
+      let sentForNotification = false;
+
       for (const subscription of userSubscriptions) {
         try {
           await sendWebPushNotification(subscription, notification);
           result.notificationsSent += 1;
+          sentForNotification = true;
         } catch {
           result.failures += 1;
           await supabase
@@ -107,6 +165,10 @@ export async function runShiftNotificationDispatch(now = new Date()): Promise<Sh
             .delete()
             .eq("id", subscription.id);
         }
+      }
+
+      if (sentForNotification) {
+        await recordNotificationSent(userId, notification);
       }
     }
   }

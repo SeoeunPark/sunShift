@@ -5,9 +5,8 @@ import { addSeoulDays } from "@/lib/date/dateUtils";
 import {
   getTodayWorkNotifySlot,
   getTomorrowWorkNotifySlot,
-  subtractMinutesFromTime,
 } from "@/lib/notifications/notificationPlanner";
-import { getRecommendedSleepForDate } from "@/lib/sleep/sleepSchedule";
+import { getCurrentSleepContext, resolveSleepNotifySlot } from "@/lib/sleep/sleepSchedule";
 import { getShiftForDate } from "@/lib/shift";
 import { DEFAULT_SHIFT_SETTINGS } from "@/lib/shift/shiftPattern";
 import { useSeoulToday } from "@/hooks/useClientOnly";
@@ -61,13 +60,13 @@ export function NotificationHelpPanel({ settings }: NotificationHelpPanelProps) 
     }
 
     if (settings.sleepEnabled) {
-      const sleep = getRecommendedSleepForDate(today, resolvedSettings);
-      const slot = subtractMinutesFromTime(sleep.bedTime, 60);
+      const sleepContext = getCurrentSleepContext(new Date(), resolvedSettings);
+      const slot = resolveSleepNotifySlot(sleepContext, 60);
       items.push({
         id: "sleep",
         category: "수면",
-        time: slot,
-        badge: sleep.label,
+        time: slot.time,
+        badge: sleepContext.sleep.label,
         accent: "sleep",
       });
     }

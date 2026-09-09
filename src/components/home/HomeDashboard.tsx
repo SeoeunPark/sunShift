@@ -10,7 +10,7 @@ import { formatKoreanDate, formatKoreanDateWithWeekday } from "@/lib/date/dateUt
 import {
   formatCompactSleepRange,
   formatCompactTimeRange,
-  getRecommendedSleepForDate,
+  getRecommendedSleepNow,
 } from "@/lib/sleep/sleepSchedule";
 import { getCyclePosition } from "@/lib/shift";
 import { formatShiftDayLabelWithTotal } from "@/lib/shift/shiftLabels";
@@ -77,7 +77,7 @@ export function HomeDashboard() {
     : null;
 
   const recommendedSleep = !isTodayLoading
-    ? getRecommendedSleepForDate(today, settings)
+    ? getRecommendedSleepNow(new Date(), settings)
     : null;
 
   const isOffToday = todayShift.code === "OFF";

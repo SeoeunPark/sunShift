@@ -1,7 +1,12 @@
-import { getRecommendedSleepForDate } from "@/lib/sleep/sleepSchedule";
-import type { ShiftSettings } from "@/lib/shift/shiftTypes";
+import { addSeoulDays } from "@/lib/date/dateUtils";
+import {
+  getRecommendedSleepForDate,
+  resolveSleepNotifySlot,
+  resolveSleepWindow,
+} from "@/lib/sleep/sleepSchedule";
 import { buildSleepNotification, type PlannedNotification } from "./notificationMessages";
-import { getSeoulDateTimeParts, subtractMinutesFromTime } from "./notificationPlanner";
+import { getSeoulDateTimeParts, hasNotifySlotStarted } from "./notificationPlanner";
+import type { ShiftSettings } from "@/lib/shift/shiftTypes";
 
 export interface SleepPlannerInput {
   now: Date;
@@ -19,17 +24,23 @@ export function planSleepNotifications(input: SleepPlannerInput): PlannedNotific
 
   const leaveSet = new Set(leaveDates);
   const { date: today, time: currentTime } = getSeoulDateTimeParts(now);
+  const planned: PlannedNotification[] = [];
 
-  if (leaveSet.has(today)) {
-    return [];
+  for (const cycleDate of [addSeoulDays(today, -1), today]) {
+    const sleep = getRecommendedSleepForDate(cycleDate, shiftSettings);
+    const window = resolveSleepWindow(cycleDate, sleep);
+    const notifySlot = resolveSleepNotifySlot(window, 60);
+
+    if (leaveSet.has(cycleDate) || leaveSet.has(notifySlot.date)) {
+      continue;
+    }
+
+    if (!hasNotifySlotStarted(today, currentTime, notifySlot)) {
+      continue;
+    }
+
+    planned.push(buildSleepNotification(sleep, cycleDate));
   }
 
-  const recommended = getRecommendedSleepForDate(today, shiftSettings);
-  const notifyTime = subtractMinutesFromTime(recommended.bedTime, 60);
-
-  if (currentTime !== notifyTime) {
-    return [];
-  }
-
-  return [buildSleepNotification(recommended, today)];
+  return planned;
 }

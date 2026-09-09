@@ -7,7 +7,7 @@ import { PAGE_VIEWPORT_HEIGHT } from "@/lib/layout/viewport";
 import {
   formatCompactTimeRange,
   getAllSleepSchedules,
-  getRecommendedSleepForDate,
+  getRecommendedSleepNow,
   type RecommendedSleep,
   type SleepScheduleKey,
 } from "@/lib/sleep/sleepSchedule";
@@ -240,7 +240,7 @@ export function SleepScheduleTable() {
   const { settings, isLoading } = useShiftSettings();
   const shiftSettings = settings ?? DEFAULT_SHIFT_SETTINGS;
   const schedules = getAllSleepSchedules();
-  const todaySleep = settings ? getRecommendedSleepForDate(today, settings) : null;
+  const todaySleep = settings ? getRecommendedSleepNow(new Date(), settings) : null;
 
   const defaultShift = useMemo((): MainShiftCode => {
     if (todaySleep && isMainShiftKey(todaySleep.key)) {

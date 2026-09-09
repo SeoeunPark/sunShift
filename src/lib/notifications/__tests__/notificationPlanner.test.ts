@@ -90,4 +90,27 @@ describe("planNotifications", () => {
 
     expect(planned.some((item) => item.kind === "today_shift")).toBe(false);
   });
+
+  it("catches up today shift notification after the scheduled minute", () => {
+    const planned = planNotifications({
+      now: new Date("2026-09-02T14:04:00+09:00"),
+      settings: baseSettings(),
+      shiftSettings: LEGACY_TEST_SHIFT_SETTINGS,
+      leaveDates: [],
+    });
+
+    expect(planned).toHaveLength(1);
+    expect(planned[0]?.kind).toBe("today_shift");
+  });
+
+  it("does not plan today shift notification before the scheduled minute", () => {
+    const planned = planNotifications({
+      now: new Date("2026-09-02T13:59:00+09:00"),
+      settings: baseSettings(),
+      shiftSettings: LEGACY_TEST_SHIFT_SETTINGS,
+      leaveDates: [],
+    });
+
+    expect(planned).toHaveLength(0);
+  });
 });

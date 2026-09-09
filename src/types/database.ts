@@ -266,6 +266,30 @@ export interface Database {
         };
         Relationships: [];
       };
+      notification_dispatches: {
+        Row: {
+          id: string;
+          user_id: string;
+          kind: string;
+          reference_date: string;
+          sent_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          kind: string;
+          reference_date: string;
+          sent_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          kind?: string;
+          reference_date?: string;
+          sent_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -285,3 +309,4 @@ export type MemoRecord = Tables<"memo_records">;
 export type NotificationSettings = Tables<"notification_settings">;
 export type SleepSettings = Tables<"sleep_settings">;
 export type PushSubscription = Tables<"push_subscriptions">;
+export type NotificationDispatch = Tables<"notification_dispatches">;
