@@ -1,3 +1,4 @@
+import { PushCatchUpProvider } from "@/components/pwa/PushCatchUpProvider";
 import { WidgetSyncProvider } from "@/components/widget/WidgetSyncProvider";
 import { AppShell } from "@/components/layout/AppShell";
 import { AuthProvider } from "@/components/auth/AuthProvider";
@@ -65,7 +66,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <OnboardingStatusProvider>
               <SyncProvider>
                 <AppShell>
-                  <WidgetSyncProvider>{children}</WidgetSyncProvider>
+                  <PushCatchUpProvider>
+                    <WidgetSyncProvider>{children}</WidgetSyncProvider>
+                  </PushCatchUpProvider>
                 </AppShell>
               </SyncProvider>
             </OnboardingStatusProvider>

@@ -6,6 +6,7 @@ describe("buildWidgetSnapshot", () => {
   it("builds today shift and sleep payload", () => {
     const snapshot = buildWidgetSnapshot(DEFAULT_SHIFT_SETTINGS, {
       today: "2026-09-06",
+      now: new Date("2026-09-06T15:00:00+09:00"),
       origin: "https://shift.example.com",
     });
 
@@ -21,7 +22,10 @@ describe("buildWidgetSnapshot", () => {
   });
 
   it("formats widget preview lines", () => {
-    const snapshot = buildWidgetSnapshot(DEFAULT_SHIFT_SETTINGS, { today: "2026-09-06" });
+    const snapshot = buildWidgetSnapshot(DEFAULT_SHIFT_SETTINGS, {
+      today: "2026-09-06",
+      now: new Date("2026-09-06T15:00:00+09:00"),
+    });
 
     expect(formatWidgetLines(snapshot, "small")).toEqual({
       primary: "B",

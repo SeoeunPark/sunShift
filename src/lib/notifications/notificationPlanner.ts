@@ -14,7 +14,7 @@ import {
 export const TODAY_WORK_NOTICE_MINUTES = 60;
 
 /** Max delay after scheduled time before a notification is skipped (cron catch-up window) */
-export const NOTIFY_CATCHUP_MINUTES = 180;
+export const NOTIFY_CATCHUP_MINUTES = 24 * 60;
 
 /** Hours before tomorrow's shift start; if that falls on tomorrow, use fallback time instead */
 export const TOMORROW_WORK_NOTICE_HOURS_BEFORE = 12;

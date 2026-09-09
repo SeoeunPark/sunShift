@@ -111,6 +111,7 @@ export function usePushSubscription() {
 
     try {
       await enableCloudPushNotifications(userId);
+      void fetch("/api/push/catch-up", { method: "POST" }).catch(() => undefined);
       const snapshot = applySnapshot({
         isConfigured: true,
         permission: "granted",

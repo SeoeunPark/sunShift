@@ -5,7 +5,13 @@ import {
   resolveSleepWindow,
 } from "@/lib/sleep/sleepSchedule";
 import { buildSleepNotification, type PlannedNotification } from "./notificationMessages";
-import { getSeoulDateTimeParts, hasNotifySlotStarted } from "./notificationPlanner";
+import {
+  getSeoulDateTimeParts,
+  hasNotifySlotStarted,
+  NOTIFY_CATCHUP_MINUTES,
+} from "./notificationPlanner";
+
+const SLEEP_NOTIFY_CATCHUP_MINUTES = 180;
 import type { ShiftSettings } from "@/lib/shift/shiftTypes";
 
 export interface SleepPlannerInput {
@@ -35,7 +41,14 @@ export function planSleepNotifications(input: SleepPlannerInput): PlannedNotific
       continue;
     }
 
-    if (!hasNotifySlotStarted(today, currentTime, notifySlot)) {
+    if (
+      !hasNotifySlotStarted(
+        today,
+        currentTime,
+        notifySlot,
+        Math.min(NOTIFY_CATCHUP_MINUTES, SLEEP_NOTIFY_CATCHUP_MINUTES),
+      )
+    ) {
       continue;
     }
 
