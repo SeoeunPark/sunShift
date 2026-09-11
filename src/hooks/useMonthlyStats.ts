@@ -22,7 +22,10 @@ export function useMonthlyStats(year?: number, month?: number) {
   const { settings, isLoading: isSettingsLoading } = useShiftSettings();
   const { records: leaveRecords, isLoading: isLeaveLoading } = useLeave();
   const shiftSettings = settings ?? DEFAULT_SHIFT_SETTINGS;
-  const leaveDates = useMemo(() => leaveRecords.map((record) => record.date), [leaveRecords]);
+  const leaveRecordsForStats = useMemo(
+    () => leaveRecords.map((record) => ({ date: record.date, type: record.type })),
+    [leaveRecords],
+  );
 
   const stats = useMemo(
     () => getMonthlyShiftStats(targetYear, targetMonth, shiftSettings),
@@ -40,13 +43,23 @@ export function useMonthlyStats(year?: number, month?: number) {
   );
 
   const leaveCount = useMemo(
-    () => countLeaveDaysInMonth(leaveDates, targetYear, targetMonth),
-    [leaveDates, targetYear, targetMonth],
+    () => countLeaveDaysInMonth(leaveRecordsForStats, targetYear, targetMonth),
+    [leaveRecordsForStats, targetYear, targetMonth],
+  );
+
+  const annualLeaveCount = useMemo(
+    () => countLeaveDaysInMonth(leaveRecordsForStats, targetYear, targetMonth, "annual"),
+    [leaveRecordsForStats, targetYear, targetMonth],
+  );
+
+  const nightCareLeaveCount = useMemo(
+    () => countLeaveDaysInMonth(leaveRecordsForStats, targetYear, targetMonth, "night_care"),
+    [leaveRecordsForStats, targetYear, targetMonth],
   );
 
   const previousLeaveCount = useMemo(
-    () => countLeaveDaysInMonth(leaveDates, previousMonth.year, previousMonth.month),
-    [leaveDates, previousMonth.month, previousMonth.year],
+    () => countLeaveDaysInMonth(leaveRecordsForStats, previousMonth.year, previousMonth.month),
+    [leaveRecordsForStats, previousMonth.month, previousMonth.year],
   );
 
   const workHours = useMemo(
@@ -68,6 +81,8 @@ export function useMonthlyStats(year?: number, month?: number) {
     stats,
     previousStats,
     leaveCount,
+    annualLeaveCount,
+    nightCareLeaveCount,
     workHours,
     comparison,
     yearSummaries,

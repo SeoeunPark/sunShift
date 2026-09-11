@@ -8,6 +8,12 @@ import { AppCard } from "@/components/ui/AppCard";
 import { ShiftBadge } from "@/components/shift/ShiftBadge";
 import { useLeave } from "@/hooks/useLeave";
 import { useLeaveRestAnalysis } from "@/hooks/useLeaveRestAnalysis";
+import {
+  DEFAULT_LEAVE_TYPE,
+  LEAVE_TYPES,
+  type LeaveType,
+} from "@/lib/leave/leaveTypes";
+import { cn } from "@/lib/utils";
 
 interface LeaveFormProps {
   initialDate?: string;
@@ -17,6 +23,7 @@ interface LeaveFormProps {
 export function LeaveForm({ initialDate = "", compact = false }: LeaveFormProps) {
   const { create, getByDate } = useLeave();
   const [date, setDate] = useState(initialDate);
+  const [type, setType] = useState<LeaveType>(DEFAULT_LEAVE_TYPE);
   const [memoDraft, setMemoDraft] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,6 +35,8 @@ export function LeaveForm({ initialDate = "", compact = false }: LeaveFormProps)
   function handleDateChange(nextDate: string) {
     setDate(nextDate);
     setMemoDraft(null);
+    const nextExisting = nextDate ? getByDate(nextDate) : null;
+    setType(nextExisting?.type ?? DEFAULT_LEAVE_TYPE);
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -40,25 +49,49 @@ export function LeaveForm({ initialDate = "", compact = false }: LeaveFormProps)
     setMessage(null);
 
     try {
-      await create({ date, memo: memo.trim() || null });
-      setMessage(existing ? "연차가 수정되었습니다." : "연차가 등록되었습니다.");
+      await create({ date, type, memo: memo.trim() || null });
+      const typeLabel = LEAVE_TYPES.find((item) => item.id === type)?.label ?? "휴가";
+      setMessage(existing ? `${typeLabel}가 수정되었습니다.` : `${typeLabel}가 등록되었습니다.`);
       setMemoDraft(null);
       if (!initialDate) {
         setDate("");
+        setType(DEFAULT_LEAVE_TYPE);
       }
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "연차 등록에 실패했습니다.");
+      setMessage(error instanceof Error ? error.message : "휴가 등록에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }
   }
 
+  const typeSelector = (
+    <div className="grid grid-cols-2 gap-1.5">
+      {LEAVE_TYPES.map((item) => (
+        <button
+          key={item.id}
+          type="button"
+          onClick={() => setType(item.id)}
+          className={cn(
+            "rounded-lg border px-2 py-2 text-xs font-medium transition-colors",
+            type === item.id
+              ? "border-primary bg-primary/10 text-primary"
+              : "border-border bg-background text-muted-foreground",
+          )}
+        >
+          {item.label}
+        </button>
+      ))}
+    </div>
+  );
+
   if (compact) {
     return (
       <AppCard as="section" className="shrink-0 p-3">
-        <h2 className="mb-2 text-xs font-semibold text-foreground">연차 등록</h2>
+        <h2 className="mb-2 text-xs font-semibold text-foreground">휴가 등록</h2>
 
         <form onSubmit={handleSubmit} className="space-y-2">
+          {typeSelector}
+
           <Input
             id="leave-date"
             type="date"
@@ -102,9 +135,14 @@ export function LeaveForm({ initialDate = "", compact = false }: LeaveFormProps)
 
   return (
     <section className="app-card p-6">
-      <h2 className="mb-4 text-sm font-medium text-muted-foreground">연차 등록</h2>
+      <h2 className="mb-4 text-sm font-medium text-muted-foreground">휴가 등록</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label>휴가 종류</Label>
+          {typeSelector}
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="leave-date">날짜</Label>
           <Input
@@ -134,8 +172,7 @@ export function LeaveForm({ initialDate = "", compact = false }: LeaveFormProps)
               <span>{restAnalysis.originalShift.name}</span>
             </div>
             <p>
-              연차 전후 OFF 포함{" "}
-              <strong>총 {restAnalysis.totalRestDays}일 휴식</strong>
+              휴가 전후 OFF 포함 <strong>총 {restAnalysis.totalRestDays}일 휴식</strong>
             </p>
             <p className="mt-1 text-muted-foreground">{restAnalysis.rangeLabel}</p>
           </div>
@@ -143,7 +180,7 @@ export function LeaveForm({ initialDate = "", compact = false }: LeaveFormProps)
 
         {existing && (
           <p className="text-sm text-muted-foreground">
-            이 날짜에 이미 연차가 등록되어 있습니다. 저장하면 메모가 업데이트됩니다.
+            이 날짜에 이미 휴가가 등록되어 있습니다. 저장하면 종류와 메모가 업데이트됩니다.
           </p>
         )}
 
@@ -154,7 +191,7 @@ export function LeaveForm({ initialDate = "", compact = false }: LeaveFormProps)
         )}
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? "등록 중..." : existing ? "연차 수정" : "연차 등록"}
+          {isSubmitting ? "등록 중..." : existing ? "휴가 수정" : "휴가 등록"}
         </Button>
       </form>
     </section>

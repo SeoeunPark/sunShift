@@ -2,7 +2,8 @@ import type { ShiftResult } from "@/lib/shift/shiftTypes";
 import { getWeekdayIndex } from "@/lib/date/dateUtils";
 import { getKoreanHoliday } from "@/lib/date/koreanHolidays";
 import { ShiftBadge } from "@/components/shift/ShiftBadge";
-import { LEAVE_COLOR } from "@/lib/theme/shiftColors";
+import { getLeaveTypeColors, getLeaveTypeLabel } from "@/lib/leave/leaveDisplay";
+import type { LeaveType } from "@/lib/leave/leaveTypes";
 import { cn } from "@/lib/utils";
 
 interface CalendarDayCellProps {
@@ -11,7 +12,7 @@ interface CalendarDayCellProps {
   today: string;
   inCurrentMonth: boolean;
   shift?: ShiftResult;
-  hasLeave?: boolean;
+  leaveType?: LeaveType | null;
   hasMemo?: boolean;
   compact?: boolean;
   onSelect: (date: string) => void;
@@ -23,7 +24,7 @@ export function CalendarDayCell({
   today,
   inCurrentMonth,
   shift,
-  hasLeave,
+  leaveType,
   hasMemo,
   compact = false,
   onSelect,
@@ -61,10 +62,13 @@ export function CalendarDayCell({
         {shift && inCurrentMonth && (
           <ShiftBadge code={shift.code} size="sm" className="min-w-[1.75rem] px-1.5 py-0 text-[11px]" />
         )}
-        {(hasLeave || hasMemo) && inCurrentMonth && (
+        {(leaveType || hasMemo) && inCurrentMonth && (
           <span className="flex gap-0.5">
-            {hasLeave && (
-              <span className={cn("size-1.5 rounded-full", LEAVE_COLOR.bg)} aria-label="연차" />
+            {leaveType && (
+              <span
+                className={cn("size-1.5 rounded-full", getLeaveTypeColors(leaveType).bg)}
+                aria-label={getLeaveTypeLabel(leaveType)}
+              />
             )}
             {hasMemo && (
               <span className="size-1.5 rounded-full bg-primary" aria-label="메모" />
@@ -109,15 +113,15 @@ export function CalendarDayCell({
       )}
 
       <div className="flex min-h-[0.875rem] items-center gap-1">
-        {hasLeave && inCurrentMonth && (
+        {leaveType && inCurrentMonth && (
           <span
             className={cn(
               "rounded px-1 text-[10px] font-medium leading-none",
-              LEAVE_COLOR.bg,
-              LEAVE_COLOR.text,
+              getLeaveTypeColors(leaveType).bg,
+              getLeaveTypeColors(leaveType).text,
             )}
           >
-            연차
+            {getLeaveTypeLabel(leaveType)}
           </span>
         )}
         {hasMemo && inCurrentMonth && (

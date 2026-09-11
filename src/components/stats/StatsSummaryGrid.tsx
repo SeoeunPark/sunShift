@@ -4,18 +4,25 @@ import type { MonthlyShiftStats } from "@/lib/shift/shiftTypes";
 
 interface StatsSummaryGridProps {
   stats: MonthlyShiftStats;
-  leaveCount: number;
+  annualLeaveCount: number;
+  nightCareLeaveCount: number;
   workHours: number;
 }
 
-export function StatsSummaryGrid({ stats, leaveCount, workHours }: StatsSummaryGridProps) {
+export function StatsSummaryGrid({
+  stats,
+  annualLeaveCount,
+  nightCareLeaveCount,
+  workHours,
+}: StatsSummaryGridProps) {
   const items = [
     { label: "A조", value: `${stats.counts.A}회` },
     { label: "B조", value: `${stats.counts.B}회` },
     { label: "C조", value: `${stats.counts.C}회` },
     { label: "휴무", value: `${stats.counts.OFF}일` },
     { label: "야간근무", value: `${stats.nightShiftCount}회` },
-    { label: "연차", value: `${leaveCount}일` },
+    { label: "연중휴가", value: `${annualLeaveCount}일` },
+    { label: "야간케어 휴가", value: `${nightCareLeaveCount}일` },
     { label: "총 근무일", value: `${stats.totalWorkDays}일` },
     { label: "총 근무시간", value: `${workHours}시간` },
   ];

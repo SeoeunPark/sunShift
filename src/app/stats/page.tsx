@@ -16,7 +16,15 @@ export default function StatsPage() {
   const [year, setYear] = useState(initial.year);
   const [month, setMonth] = useState(initial.month);
 
-  const { stats, leaveCount, workHours, comparison, yearSummaries, isLoading } = useMonthlyStats(
+  const {
+    stats,
+    annualLeaveCount,
+    nightCareLeaveCount,
+    workHours,
+    comparison,
+    yearSummaries,
+    isLoading,
+  } = useMonthlyStats(
     year,
     month,
   );
@@ -43,7 +51,12 @@ export default function StatsPage() {
         }}
       />
 
-      <StatsSummaryGrid stats={stats} leaveCount={leaveCount} workHours={workHours} />
+      <StatsSummaryGrid
+        stats={stats}
+        annualLeaveCount={annualLeaveCount}
+        nightCareLeaveCount={nightCareLeaveCount}
+        workHours={workHours}
+      />
       <StatsShiftBars stats={stats} />
       <StatsMonthComparison year={year} month={month} comparison={comparison} />
       <StatsYearOverview year={year} month={month} summaries={yearSummaries} />

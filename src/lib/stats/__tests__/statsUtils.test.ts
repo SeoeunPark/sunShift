@@ -11,8 +11,26 @@ import {
 describe("statsUtils", () => {
   it("counts leave days in a month", () => {
     expect(
-      countLeaveDaysInMonth(["2026-09-02", "2026-09-10", "2026-10-01"], 2026, 9),
+      countLeaveDaysInMonth(
+        [
+          { date: "2026-09-02", type: "annual" },
+          { date: "2026-09-10", type: "night_care" },
+          { date: "2026-10-01", type: "annual" },
+        ],
+        2026,
+        9,
+      ),
     ).toBe(2);
+  });
+
+  it("counts leave days by type", () => {
+    const records = [
+      { date: "2026-09-02", type: "annual" as const },
+      { date: "2026-09-10", type: "night_care" as const },
+    ];
+
+    expect(countLeaveDaysInMonth(records, 2026, 9, "annual")).toBe(1);
+    expect(countLeaveDaysInMonth(records, 2026, 9, "night_care")).toBe(1);
   });
 
   it("calculates shift duration hours", () => {

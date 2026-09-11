@@ -15,7 +15,7 @@ import {
 import { getCyclePosition } from "@/lib/shift";
 import { formatShiftDayLabelWithTotal } from "@/lib/shift/shiftLabels";
 import { getPatternById } from "@/lib/shift/shiftPattern";
-import { useLeaveBalance } from "@/hooks/useLeaveBalance";
+import { useLeaveBalances } from "@/hooks/useLeaveBalance";
 import { useNextOff, useNextWorkDay, useTodayShift } from "@/hooks/useTodayShift";
 import { PAGE_VIEWPORT_HEIGHT } from "@/lib/layout/viewport";
 import { cn } from "@/lib/utils";
@@ -65,7 +65,7 @@ export function HomeDashboard() {
   const { today, todayShift, settings, isLoading: isTodayLoading } = useTodayShift();
   const { nextOffDate, daysUntilOff, isLoading: isOffLoading } = useNextOff();
   const { nextWorkDay, isLoading: isWorkLoading } = useNextWorkDay();
-  const { remaining, total, isLoading: isLeaveLoading } = useLeaveBalance();
+  const { annual, nightCare, isLoading: isLeaveLoading } = useLeaveBalances();
 
   const isLoading = isTodayLoading || isOffLoading || isWorkLoading || isLeaveLoading;
 
@@ -149,11 +149,13 @@ export function HomeDashboard() {
                 )}
               </HomeStatCard>
 
-              <HomeStatCard label="연차" icon={TreePalm} href="/leave" accent="primary">
-                <p className="text-base font-bold tabular-nums text-primary">
-                  {remaining}/{total}
+              <HomeStatCard label="휴가" icon={TreePalm} href="/leave" accent="primary">
+                <p className="text-sm font-bold leading-tight tabular-nums text-primary">
+                  연중 {annual.remaining}/{annual.total}
                 </p>
-                <p className="text-[10px] text-muted-foreground">잔여</p>
+                <p className="text-[10px] tabular-nums text-muted-foreground">
+                  야간케어 {nightCare.remaining}/{nightCare.total}
+                </p>
               </HomeStatCard>
             </div>
           </div>

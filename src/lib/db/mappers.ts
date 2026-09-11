@@ -1,3 +1,4 @@
+import { normalizeLeaveType } from "@/lib/leave/leaveTypes";
 import { DEFAULT_SHIFT_SETTINGS } from "@/lib/shift/shiftPattern";
 import type { ShiftSettings } from "@/lib/shift/shiftTypes";
 import type {
@@ -182,6 +183,7 @@ export function fromRemoteLeaveRecord(row: DbLeaveRecord): import("@/types/local
     id: row.id,
     userId: row.user_id,
     date: row.date,
+    type: normalizeLeaveType(row.type),
     memo: row.memo,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

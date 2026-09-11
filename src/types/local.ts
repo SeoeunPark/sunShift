@@ -1,3 +1,4 @@
+import type { LeaveType } from "@/lib/leave/leaveTypes";
 import type { ShiftCode, ShiftDefinition, ShiftSettings } from "@/lib/shift/shiftTypes";
 import type { SleepShiftCode } from "@/types/database";
 
@@ -21,6 +22,7 @@ export interface LocalShiftSettings extends BaseLocalRecord {
 
 export interface LocalLeaveRecord extends BaseLocalRecord {
   date: string;
+  type: LeaveType;
   memo: string | null;
 }
 
@@ -51,6 +53,7 @@ export interface LeaveRecord {
   id: string;
   userId: string;
   date: string;
+  type: LeaveType;
   memo: string | null;
   createdAt: string;
   updatedAt: string;
@@ -91,8 +94,8 @@ export interface SleepSetting {
   updatedAt: string;
 }
 
-export type CreateLeaveInput = Pick<LeaveRecord, "date" | "memo">;
-export type UpdateLeaveInput = Partial<Pick<LeaveRecord, "date" | "memo">>;
+export type CreateLeaveInput = Pick<LeaveRecord, "date" | "type" | "memo">;
+export type UpdateLeaveInput = Partial<Pick<LeaveRecord, "date" | "type" | "memo">>;
 
 export type CreateMemoInput = Pick<MemoRecord, "date" | "content">;
 export type UpdateMemoInput = Partial<Pick<MemoRecord, "date" | "content">>;

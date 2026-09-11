@@ -16,7 +16,7 @@ const APP_TIPS = [
   { label: "홈", text: "오늘 근무, 다음 휴무, 이번 달 달력" },
   { label: "달력", text: "월별 근무표 · 연차 · 메모" },
   { label: "꿀잠", text: "교대별 추천 수면 시간" },
-  { label: "연차", text: "연차 등록 · 잔여 일수" },
+  { label: "휴가", text: "연중·야간케어 휴가 등록 · 잔여 일수" },
 ] as const;
 
 export function SettingsUsageGuide() {

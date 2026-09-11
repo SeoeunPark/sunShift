@@ -45,6 +45,7 @@ describe("LeaveRepository", () => {
   it("creates and lists leave records", async () => {
     const created = await leaveRepository.create(LOCAL_USER_ID, {
       date: "2026-09-18",
+      type: "annual",
       memo: "개인 연차",
     });
 
@@ -58,6 +59,7 @@ describe("LeaveRepository", () => {
   it("updates leave record by id", async () => {
     const created = await leaveRepository.create(LOCAL_USER_ID, {
       date: "2026-09-20",
+      type: "night_care",
       memo: "병원",
     });
 
@@ -71,6 +73,7 @@ describe("LeaveRepository", () => {
   it("deletes leave record", async () => {
     const created = await leaveRepository.create(LOCAL_USER_ID, {
       date: "2026-09-21",
+      type: "annual",
       memo: null,
     });
 

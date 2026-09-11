@@ -10,6 +10,7 @@ export interface Database {
           id: string;
           display_name: string | null;
           leave_total: number;
+          night_care_leave_total: number;
           created_at: string;
           updated_at: string;
         };
@@ -17,6 +18,7 @@ export interface Database {
           id: string;
           display_name?: string | null;
           leave_total?: number;
+          night_care_leave_total?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -24,6 +26,7 @@ export interface Database {
           id?: string;
           display_name?: string | null;
           leave_total?: number;
+          night_care_leave_total?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -106,6 +109,7 @@ export interface Database {
           id: string;
           user_id: string;
           date: string;
+          type: string;
           memo: string | null;
           created_at: string;
           updated_at: string;
@@ -114,6 +118,7 @@ export interface Database {
           id?: string;
           user_id: string;
           date: string;
+          type?: string;
           memo?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -122,6 +127,7 @@ export interface Database {
           id?: string;
           user_id?: string;
           date?: string;
+          type?: string;
           memo?: string | null;
           created_at?: string;
           updated_at?: string;

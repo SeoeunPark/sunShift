@@ -1,4 +1,5 @@
 import { createId, nowIso } from "@/lib/db/mappers";
+import { DEFAULT_LEAVE_TYPE } from "@/lib/leave/leaveTypes";
 import { enqueueSync } from "@/lib/sync";
 import type { CreateLeaveInput, LeaveRecord, UpdateLeaveInput } from "@/types/local";
 import { localLeaveStore } from "./local";
@@ -8,6 +9,7 @@ function toLeaveRecord(local: import("@/types/local").LocalLeaveRecord): LeaveRe
     id: local.id,
     userId: local.userId,
     date: local.date,
+    type: local.type ?? DEFAULT_LEAVE_TYPE,
     memo: local.memo,
     createdAt: local.createdAt,
     updatedAt: local.updatedAt,
@@ -36,6 +38,7 @@ export class LeaveRepository {
       id: createId(),
       userId,
       date: input.date,
+      type: input.type ?? DEFAULT_LEAVE_TYPE,
       memo: input.memo ?? null,
       createdAt: timestamp,
       updatedAt: timestamp,
@@ -62,6 +65,7 @@ export class LeaveRepository {
     const record = {
       ...existing,
       date: input.date ?? existing.date,
+      type: input.type ?? existing.type ?? DEFAULT_LEAVE_TYPE,
       memo: input.memo !== undefined ? input.memo : existing.memo,
       updatedAt: nowIso(),
       syncStatus: "pending" as const,

@@ -98,6 +98,7 @@ export const remoteLeaveStore = {
           id: record.id,
           user_id: record.userId,
           date: record.date,
+          type: record.type,
           memo: record.memo,
         },
         { onConflict: "user_id,date" },

@@ -24,7 +24,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
-import { LEAVE_COLOR } from "@/lib/theme/shiftColors";
+import { getLeaveTypeColors, getLeaveTypeLabel } from "@/lib/leave/leaveDisplay";
 import { cn } from "@/lib/utils";
 import { useLeave } from "@/hooks/useLeave";
 import { useMemos } from "@/hooks/useMemos";
@@ -130,8 +130,14 @@ export function DateDetailSheet({ date, open, onOpenChange }: DateDetailSheetPro
           )}
 
           {leave && (
-            <Badge className={cn(LEAVE_COLOR.bg, LEAVE_COLOR.text, LEAVE_COLOR.border)}>
-              연차
+            <Badge
+              className={cn(
+                getLeaveTypeColors(leave.type).bg,
+                getLeaveTypeColors(leave.type).text,
+                getLeaveTypeColors(leave.type).border,
+              )}
+            >
+              {getLeaveTypeLabel(leave.type)}
             </Badge>
           )}
 
@@ -161,7 +167,7 @@ export function DateDetailSheet({ date, open, onOpenChange }: DateDetailSheetPro
             href={`/leave?date=${date}`}
             className="inline-flex h-9 flex-1 items-center justify-center rounded-lg border border-border bg-background px-2.5 text-sm font-medium hover:bg-muted"
           >
-            연차 등록
+            휴가 등록
           </Link>
           <Link
             href={`/memo?date=${date}`}

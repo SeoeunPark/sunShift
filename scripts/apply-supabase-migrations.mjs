@@ -9,7 +9,10 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import pg from "pg";
 
-const MIGRATION_FILES = ["supabase/migrations/006_apply_pending_notification_schema.sql"];
+const MIGRATION_FILES = [
+  "supabase/migrations/006_apply_pending_notification_schema.sql",
+  "supabase/migrations/007_leave_types.sql",
+];
 
 function loadEnvLocal() {
   try {

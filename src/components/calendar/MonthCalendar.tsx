@@ -52,7 +52,7 @@ export function MonthCalendar({
       year,
       month,
       scheduleByDate,
-      leaveDates: new Set(leaveByDate.keys()),
+      leaveByDate,
     }),
     [year, month, scheduleByDate, leaveByDate],
   );
@@ -172,7 +172,7 @@ export function MonthCalendar({
               today={today}
               inCurrentMonth={day.inCurrentMonth}
               shift={scheduleByDate.get(day.date)}
-              hasLeave={leaveByDate.has(day.date)}
+              leaveType={leaveByDate.get(day.date)?.type ?? null}
               hasMemo={memoByDate.has(day.date)}
               compact={isCompact}
               onSelect={handleSelectDate}

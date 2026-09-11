@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { href: "/", label: "홈", icon: Home },
   { href: "/calendar", label: "달력", icon: Calendar },
   { href: "/sleep", label: "꿀잠", icon: Moon },
-  { href: "/leave", label: "연차", icon: TreePalm },
+  { href: "/leave", label: "휴가", icon: TreePalm },
   { href: "/settings", label: "설정", icon: Settings },
 ] as const;
 

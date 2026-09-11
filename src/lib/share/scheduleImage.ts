@@ -55,7 +55,7 @@ function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 }
 
 export async function createScheduleShareImage(input: ScheduleShareInput): Promise<Blob> {
-  const { year, month, scheduleByDate, leaveDates } = input;
+  const { year, month, scheduleByDate, leaveByDate } = input;
   const days = getCalendarDays(year, month);
   const rows = Math.ceil(days.length / COLS);
   const width = PADDING * 2 + COLS * CELL_SIZE;
@@ -114,7 +114,7 @@ export async function createScheduleShareImage(input: ScheduleShareInput): Promi
     const x = PADDING + col * CELL_SIZE;
     const y = PADDING + HEADER_HEIGHT + row * CELL_SIZE;
     const shift = scheduleByDate.get(day.date);
-    const hasLeave = leaveDates.has(day.date);
+    const hasLeave = leaveByDate.has(day.date);
 
     drawDayCell(context, {
       x,

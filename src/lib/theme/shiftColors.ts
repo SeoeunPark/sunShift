@@ -34,5 +34,12 @@ export const LEAVE_COLOR = {
   bg: "bg-shift-leave",
   text: "text-shift-leave-foreground",
   border: "border-shift-leave",
-  label: "연차",
+  label: "연중",
+};
+
+export const NIGHT_CARE_LEAVE_COLOR = {
+  bg: "bg-violet-500/15",
+  text: "text-violet-700 dark:text-violet-300",
+  border: "border-violet-500/25",
+  label: "야간케어",
 };

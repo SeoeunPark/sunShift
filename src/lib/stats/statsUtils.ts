@@ -1,15 +1,21 @@
+import type { LeaveType } from "@/lib/leave/leaveTypes";
 import { getMonthSchedule } from "@/lib/shift";
 import { getShiftDefinition } from "@/lib/shift/shiftPattern";
 import type { ShiftDefinition, ShiftSettings, MonthlyShiftStats } from "@/lib/shift/shiftTypes";
+import type { LeaveRecord } from "@/types/local";
 
 export function countLeaveDaysInMonth(
-  leaveDates: string[],
+  leaveRecords: Pick<LeaveRecord, "date" | "type">[],
   year: number,
   month: number,
+  type?: LeaveType,
 ): number {
-  return leaveDates.filter((date) => {
-    const [y, m] = date.split("-").map(Number);
-    return y === year && m === month;
+  return leaveRecords.filter((record) => {
+    const [y, m] = record.date.split("-").map(Number);
+    if (y !== year || m !== month) {
+      return false;
+    }
+    return type ? record.type === type : true;
   }).length;
 }
 

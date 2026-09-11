@@ -7,7 +7,8 @@ import { ShiftBadge } from "@/components/shift/ShiftBadge";
 import { Badge } from "@/components/ui/badge";
 import { AppCard } from "@/components/ui/AppCard";
 import { formatKoreanDateWithWeekday } from "@/lib/date/dateUtils";
-import { LEAVE_COLOR } from "@/lib/theme/shiftColors";
+import { getLeaveTypeColors, getLeaveTypeLabel } from "@/lib/leave/leaveDisplay";
+import type { LeaveType } from "@/lib/leave/leaveTypes";
 import { getShiftForDate } from "@/lib/shift";
 import { DEFAULT_SHIFT_SETTINGS } from "@/lib/shift/shiftPattern";
 import { cn } from "@/lib/utils";
@@ -18,11 +19,13 @@ import { useShiftSettings } from "@/hooks/useShiftSettings";
 function LeaveRecordItem({
   id,
   date,
+  type,
   memo,
   compact,
 }: {
   id: string;
   date: string;
+  type: LeaveType;
   memo: string | null;
   compact?: boolean;
 }) {
@@ -32,6 +35,7 @@ function LeaveRecordItem({
   const originalShift = getShiftForDate(date, shiftSettings);
   const restAnalysis = useLeaveRestAnalysis(date);
   const [isDeleting, setIsDeleting] = useState(false);
+  const colors = getLeaveTypeColors(type);
 
   async function handleDelete() {
     setIsDeleting(true);
@@ -51,12 +55,12 @@ function LeaveRecordItem({
             <Badge
               className={cn(
                 "h-4 px-1.5 text-[9px] font-semibold",
-                LEAVE_COLOR.bg,
-                LEAVE_COLOR.text,
-                LEAVE_COLOR.border,
+                colors.bg,
+                colors.text,
+                colors.border,
               )}
             >
-              연차
+              {getLeaveTypeLabel(type)}
             </Badge>
           </div>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground">
@@ -72,7 +76,7 @@ function LeaveRecordItem({
           size="icon-sm"
           onClick={() => void handleDelete()}
           disabled={isDeleting}
-          aria-label="연차 삭제"
+          aria-label="휴가 삭제"
           className="shrink-0"
         >
           <Trash2 className="size-3.5 text-destructive" />
@@ -87,8 +91,8 @@ function LeaveRecordItem({
         <div className="space-y-2">
           <p className="font-medium">{formatKoreanDateWithWeekday(date)}</p>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className={cn(LEAVE_COLOR.bg, LEAVE_COLOR.text, LEAVE_COLOR.border)}>
-              연차
+            <Badge className={cn(colors.bg, colors.text, colors.border)}>
+              {getLeaveTypeLabel(type)}
             </Badge>
             <span className="text-xs text-muted-foreground">원래</span>
             <ShiftBadge code={originalShift.code} size="sm" />
@@ -105,7 +109,7 @@ function LeaveRecordItem({
           size="icon-sm"
           onClick={() => void handleDelete()}
           disabled={isDeleting}
-          aria-label="연차 삭제"
+          aria-label="휴가 삭제"
         >
           <Trash2 className="size-4 text-destructive" />
         </Button>
@@ -137,13 +141,13 @@ export function LeaveRecordList({ compact = false, className }: LeaveRecordListP
   if (records.length === 0) {
     return compact ? (
       <AppCard className={cn("flex flex-1 flex-col justify-center p-4 text-center", className)}>
-        <p className="text-xs font-semibold text-foreground">등록된 연차</p>
-        <p className="mt-1 text-[11px] text-muted-foreground">아직 등록된 연차가 없습니다.</p>
+        <p className="text-xs font-semibold text-foreground">등록된 휴가</p>
+        <p className="mt-1 text-[11px] text-muted-foreground">아직 등록된 휴가가 없습니다.</p>
       </AppCard>
     ) : (
       <section className="app-card p-6">
-        <h2 className="mb-2 text-sm font-medium text-muted-foreground">등록된 연차</h2>
-        <p className="text-sm text-muted-foreground">등록된 연차가 없습니다.</p>
+        <h2 className="mb-2 text-sm font-medium text-muted-foreground">등록된 휴가</h2>
+        <p className="text-sm text-muted-foreground">등록된 휴가가 없습니다.</p>
       </section>
     );
   }
@@ -152,7 +156,7 @@ export function LeaveRecordList({ compact = false, className }: LeaveRecordListP
     return (
       <AppCard className={cn("flex min-h-0 flex-col overflow-hidden p-2.5", className)}>
         <h2 className="mb-1.5 shrink-0 px-0.5 text-xs font-semibold text-foreground">
-          등록된 연차 ({records.length})
+          등록된 휴가 ({records.length})
         </h2>
         <ul className="min-h-0 flex-1 space-y-1.5 overflow-y-auto overscroll-contain pr-0.5">
           {records.map((record) => (
@@ -160,6 +164,7 @@ export function LeaveRecordList({ compact = false, className }: LeaveRecordListP
               key={record.id}
               id={record.id}
               date={record.date}
+              type={record.type}
               memo={record.memo}
               compact
             />
@@ -171,13 +176,14 @@ export function LeaveRecordList({ compact = false, className }: LeaveRecordListP
 
   return (
     <section className="app-card p-6">
-      <h2 className="mb-4 text-sm font-medium text-muted-foreground">등록된 연차</h2>
+      <h2 className="mb-4 text-sm font-medium text-muted-foreground">등록된 휴가</h2>
       <ul className="space-y-3">
         {records.map((record) => (
           <LeaveRecordItem
             key={record.id}
             id={record.id}
             date={record.date}
+            type={record.type}
             memo={record.memo}
           />
         ))}
