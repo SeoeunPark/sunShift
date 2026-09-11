@@ -69,7 +69,7 @@ export async function subscribeToPush(userId: string): Promise<PushSubscriptionP
   const { error: deleteError } = await supabase
     .from("push_subscriptions")
     .delete()
-    .eq("user_id", userId);
+    .eq("endpoint", payload.endpoint);
 
   if (deleteError) {
     throw new Error(deleteError.message);

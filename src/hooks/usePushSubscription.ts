@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { enableCloudPushNotifications } from "@/lib/notifications/ensureCloudNotifications";
 import {
   getLocalPushSubscription,
+  getPushSubscriptionPayload,
   unsubscribeFromPush,
 } from "@/lib/push/subscription";
 import { fetchPushConfig } from "@/lib/push/clientConfig";
@@ -111,7 +112,14 @@ export function usePushSubscription() {
 
     try {
       await enableCloudPushNotifications(userId);
-      void fetch("/api/push/catch-up", { method: "POST" }).catch(() => undefined);
+      const payload = await getPushSubscriptionPayload();
+      if (payload) {
+        void fetch("/api/push/catch-up", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }).catch(() => undefined);
+      }
       const snapshot = applySnapshot({
         isConfigured: true,
         permission: "granted",
