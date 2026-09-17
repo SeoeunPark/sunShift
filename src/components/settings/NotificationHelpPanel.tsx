@@ -5,6 +5,8 @@ import { addSeoulDays } from "@/lib/date/dateUtils";
 import {
   getTodayWorkNotifySlot,
   getTomorrowWorkNotifySlot,
+  isNotifySlotUpcoming,
+  notifySlotToDate,
 } from "@/lib/notifications/notificationPlanner";
 import { getCurrentSleepContext, resolveSleepNotifySlot } from "@/lib/sleep/sleepSchedule";
 import { getShiftForDate } from "@/lib/shift";
@@ -24,6 +26,7 @@ interface NextNotificationItem {
   time: string;
   badge: string;
   accent?: "work" | "sleep";
+  sortAt: number;
 }
 
 export function NotificationHelpPanel({ settings }: NotificationHelpPanelProps) {
@@ -32,6 +35,7 @@ export function NotificationHelpPanel({ settings }: NotificationHelpPanelProps) 
   const resolvedSettings = shiftSettings ?? DEFAULT_SHIFT_SETTINGS;
 
   const nextItems = useMemo(() => {
+    const now = new Date();
     const tomorrow = addSeoulDays(today, 1);
     const todayShift = getShiftForDate(today, resolvedSettings);
     const tomorrowShift = getShiftForDate(tomorrow, resolvedSettings);
@@ -39,39 +43,48 @@ export function NotificationHelpPanel({ settings }: NotificationHelpPanelProps) 
 
     if (settings.todayEnabled && todayShift.code !== "OFF" && todayShift.startTime) {
       const slot = getTodayWorkNotifySlot(today, todayShift.startTime);
-      items.push({
-        id: "today-work",
-        category: "오늘 근무",
-        time: slot.time,
-        badge: todayShift.name,
-        accent: "work",
-      });
+      if (isNotifySlotUpcoming(now, slot)) {
+        items.push({
+          id: "today-work",
+          category: "오늘 근무",
+          time: slot.time,
+          badge: todayShift.name,
+          accent: "work",
+          sortAt: notifySlotToDate(slot).getTime(),
+        });
+      }
     }
 
     if (settings.tomorrowEnabled && tomorrowShift.code !== "OFF" && tomorrowShift.startTime) {
       const slot = getTomorrowWorkNotifySlot(today, tomorrow, tomorrowShift.startTime);
-      items.push({
-        id: "tomorrow-work",
-        category: "전날 알림",
-        time: slot.time,
-        badge: tomorrowShift.name,
-        accent: "work",
-      });
+      if (isNotifySlotUpcoming(now, slot)) {
+        items.push({
+          id: "tomorrow-work",
+          category: "전날 알림",
+          time: slot.time,
+          badge: tomorrowShift.name,
+          accent: "work",
+          sortAt: notifySlotToDate(slot).getTime(),
+        });
+      }
     }
 
     if (settings.sleepEnabled) {
-      const sleepContext = getCurrentSleepContext(new Date(), resolvedSettings);
+      const sleepContext = getCurrentSleepContext(now, resolvedSettings);
       const slot = resolveSleepNotifySlot(sleepContext, 60);
-      items.push({
-        id: "sleep",
-        category: "수면",
-        time: slot.time,
-        badge: sleepContext.sleep.label,
-        accent: "sleep",
-      });
+      if (isNotifySlotUpcoming(now, slot)) {
+        items.push({
+          id: "sleep",
+          category: "수면",
+          time: slot.time,
+          badge: sleepContext.sleep.label,
+          accent: "sleep",
+          sortAt: notifySlotToDate(slot).getTime(),
+        });
+      }
     }
 
-    return items;
+    return items.sort((a, b) => a.sortAt - b.sortAt);
   }, [today, resolvedSettings, settings]);
 
   if (isLoading || nextItems.length === 0) {

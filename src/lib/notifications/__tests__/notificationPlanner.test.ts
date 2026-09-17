@@ -113,4 +113,27 @@ describe("planNotifications", () => {
 
     expect(planned).toHaveLength(0);
   });
+
+  it("uses remaining minutes in the body when dispatch is slightly late", () => {
+    const planned = planNotifications({
+      now: new Date("2026-09-02T14:10:00+09:00"),
+      settings: baseSettings(),
+      shiftSettings: LEGACY_TEST_SHIFT_SETTINGS,
+      leaveDates: [],
+    });
+
+    expect(planned).toHaveLength(1);
+    expect(planned[0]?.body).toContain("50분 후");
+  });
+
+  it("skips today shift notification after the catch-up window", () => {
+    const planned = planNotifications({
+      now: new Date("2026-09-02T15:00:00+09:00"),
+      settings: baseSettings(),
+      shiftSettings: LEGACY_TEST_SHIFT_SETTINGS,
+      leaveDates: [],
+    });
+
+    expect(planned).toHaveLength(0);
+  });
 });

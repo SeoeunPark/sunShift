@@ -11,7 +11,7 @@ import {
   NOTIFY_CATCHUP_MINUTES,
 } from "./notificationPlanner";
 
-const SLEEP_NOTIFY_CATCHUP_MINUTES = 180;
+const SLEEP_NOTIFY_CATCHUP_MINUTES = 60;
 import type { ShiftSettings } from "@/lib/shift/shiftTypes";
 
 export interface SleepPlannerInput {
@@ -29,7 +29,7 @@ export function planSleepNotifications(input: SleepPlannerInput): PlannedNotific
   }
 
   const leaveSet = new Set(leaveDates);
-  const { date: today, time: currentTime } = getSeoulDateTimeParts(now);
+  const { date: today } = getSeoulDateTimeParts(now);
   const planned: PlannedNotification[] = [];
 
   for (const cycleDate of [addSeoulDays(today, -1), today]) {
@@ -43,8 +43,7 @@ export function planSleepNotifications(input: SleepPlannerInput): PlannedNotific
 
     if (
       !hasNotifySlotStarted(
-        today,
-        currentTime,
+        now,
         notifySlot,
         Math.min(NOTIFY_CATCHUP_MINUTES, SLEEP_NOTIFY_CATCHUP_MINUTES),
       )

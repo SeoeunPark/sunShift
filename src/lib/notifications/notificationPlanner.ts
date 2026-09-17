@@ -13,8 +13,8 @@ import {
 /** Minutes before shift start for today's work reminder */
 export const TODAY_WORK_NOTICE_MINUTES = 60;
 
-/** Max delay after scheduled time before a notification is skipped (cron catch-up window) */
-export const NOTIFY_CATCHUP_MINUTES = 24 * 60;
+/** Max minutes after scheduled time to still send (5-min cron + delay slack) */
+export const NOTIFY_CATCHUP_MINUTES = 45;
 
 /** Hours before tomorrow's shift start; if that falls on tomorrow, use fallback time instead */
 export const TOMORROW_WORK_NOTICE_HOURS_BEFORE = 12;
@@ -103,38 +103,41 @@ export function getPreDayWorkNotifyTime(startTime: string): string {
   return slot.time;
 }
 
-function timeToMinutes(time: string): number {
-  const [hours, mins] = normalizeTimeToHm(time).split(":").map(Number);
-  return hours * 60 + mins;
+export function notifySlotToDate(slot: NotifySlot): Date {
+  return toZonedTime(`${slot.date}T${normalizeTimeToHm(slot.time)}:00`, SEOUL_TIMEZONE);
 }
 
-/** True once the scheduled notify time has started on the slot date (supports cron catch-up). */
+/** Minutes elapsed since the scheduled notify time (negative = not yet). */
+export function getMinutesSinceNotifySlot(now: Date, slot: NotifySlot): number {
+  const slotStart = notifySlotToDate(slot);
+  const nowZoned = toZonedTime(now, SEOUL_TIMEZONE);
+  return (nowZoned.getTime() - slotStart.getTime()) / (60 * 1000);
+}
+
+export function getMinutesUntilShiftStart(now: Date, date: string, startTime: string): number {
+  const start = toZonedTime(`${date}T${normalizeTimeToHm(startTime)}:00`, SEOUL_TIMEZONE);
+  const nowZoned = toZonedTime(now, SEOUL_TIMEZONE);
+  return Math.round((start.getTime() - nowZoned.getTime()) / (60 * 1000));
+}
+
+/** True once the scheduled notify time has started (supports short cron catch-up). */
 export function hasNotifySlotStarted(
-  currentDate: string,
-  currentTime: string,
+  now: Date,
   slot: NotifySlot,
   catchupMinutes = NOTIFY_CATCHUP_MINUTES,
 ): boolean {
-  if (currentDate !== slot.date) {
-    return false;
-  }
-
-  const diff = timeToMinutes(currentTime) - timeToMinutes(slot.time);
-  return diff >= 0 && diff <= catchupMinutes;
+  const elapsed = getMinutesSinceNotifySlot(now, slot);
+  return elapsed >= 0 && elapsed <= catchupMinutes;
 }
 
-function matchesCurrentSlot(
-  currentDate: string,
-  currentTime: string,
-  slot: NotifySlot,
-): boolean {
-  return hasNotifySlotStarted(currentDate, currentTime, slot);
+export function isNotifySlotUpcoming(now: Date, slot: NotifySlot): boolean {
+  return getMinutesSinceNotifySlot(now, slot) < 0;
 }
 
 export function planNotifications(input: NotificationPlannerInput): PlannedNotification[] {
   const { now, settings, shiftSettings, leaveDates } = input;
   const leaveSet = new Set(leaveDates);
-  const { date: today, time: currentTime } = getSeoulDateTimeParts(now);
+  const { date: today } = getSeoulDateTimeParts(now);
   const tomorrow = addSeoulDays(today, 1);
   const todayShift = getShiftForDate(today, shiftSettings);
   const tomorrowShift = getShiftForDate(tomorrow, shiftSettings);
@@ -143,29 +146,32 @@ export function planNotifications(input: NotificationPlannerInput): PlannedNotif
   const hasLeaveToday = leaveSet.has(today);
   const hasLeaveTomorrow = leaveSet.has(tomorrow);
 
+  const todaySlot =
+    todayShift.startTime && getTodayWorkNotifySlot(today, todayShift.startTime);
   const todayNotification =
     settings.todayEnabled &&
     !hasLeaveToday &&
     todayShift.code !== "OFF" &&
-    todayShift.startTime &&
-    matchesCurrentSlot(
-      today,
-      currentTime,
-      getTodayWorkNotifySlot(today, todayShift.startTime),
-    )
-      ? buildTodayShiftNotification(todayShift, TODAY_WORK_NOTICE_MINUTES)
+    todaySlot &&
+    hasNotifySlotStarted(now, todaySlot)
+      ? buildTodayShiftNotification(
+          todayShift,
+          Math.min(
+            TODAY_WORK_NOTICE_MINUTES,
+            Math.max(1, getMinutesUntilShiftStart(now, today, todayShift.startTime!)),
+          ),
+        )
       : null;
 
+  const tomorrowSlot =
+    tomorrowShift.startTime &&
+    getTomorrowWorkNotifySlot(today, tomorrow, tomorrowShift.startTime);
   const tomorrowNotification =
     settings.tomorrowEnabled &&
     !hasLeaveTomorrow &&
     tomorrowShift.code !== "OFF" &&
-    tomorrowShift.startTime &&
-    matchesCurrentSlot(
-      today,
-      currentTime,
-      getTomorrowWorkNotifySlot(today, tomorrow, tomorrowShift.startTime),
-    )
+    tomorrowSlot &&
+    hasNotifySlotStarted(now, tomorrowSlot)
       ? buildTomorrowShiftNotification(tomorrowShift)
       : null;
 
