@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import {
+  getAllGroupsShiftForDate,
   getNextOffDate,
   getShiftForDate,
+  isFourGroupSchedule,
 } from "@/lib/shift";
 import {
   addSeoulDays,
@@ -74,6 +76,9 @@ export function DateDetailSheet({ date, open, onOpenChange }: DateDetailSheetPro
   }
 
   const { shift, nextWork, nextOffDate } = getShiftDetail(date, shiftSettings);
+  const groupShifts = isFourGroupSchedule(shiftSettings)
+    ? getAllGroupsShiftForDate(date, shiftSettings)
+    : [];
   const leave = getLeaveByDate(date);
   const memo = getMemoByDate(date);
   const holidayName = getKoreanHoliday(date);
@@ -127,6 +132,43 @@ export function DateDetailSheet({ date, open, onOpenChange }: DateDetailSheetPro
 
           {shift.code === "OFF" && (
             <p className="text-muted-foreground">휴무일입니다</p>
+          )}
+
+          {groupShifts.length > 0 && (
+            <div className="rounded-xl border bg-muted/25 p-3">
+              <p className="mb-2 text-xs font-semibold text-foreground">조별 근무</p>
+              <ul className="space-y-2">
+                {groupShifts.map((row) => (
+                  <li
+                    key={row.groupNumber}
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm",
+                      row.isMine && "bg-primary/8 ring-1 ring-primary/15",
+                    )}
+                  >
+                    <ShiftBadge code={row.shift.code} size="sm" />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium leading-tight">
+                        {row.groupNumber}조
+                        {row.isMine && (
+                          <span className="ml-1.5 text-[10px] font-semibold text-primary">내 조</span>
+                        )}
+                        <span className="ml-1.5 font-normal text-muted-foreground">{row.shift.name}</span>
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {row.cycleLabel}
+                        {row.shift.startTime && row.shift.endTime && (
+                          <span className="tabular-nums">
+                            {" "}
+                            · {row.shift.startTime}~{row.shift.endTime}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
 
           {leave && (
