@@ -75,8 +75,14 @@ export function useLeaveBalance(type: LeaveType = "annual") {
       if (isSupabaseConfigured() && profile) {
         const supabase = createClient();
         if (supabase) {
-          const column = type === "annual" ? "leave_total" : "night_care_leave_total";
-          await supabase.from("profiles").update({ [column]: normalized }).eq("id", userId);
+          if (type === "annual") {
+            await supabase.from("profiles").update({ leave_total: normalized }).eq("id", userId);
+          } else {
+            await supabase
+              .from("profiles")
+              .update({ night_care_leave_total: normalized })
+              .eq("id", userId);
+          }
         }
       }
     },

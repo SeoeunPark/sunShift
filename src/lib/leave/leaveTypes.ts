@@ -22,5 +22,6 @@ export function getLeaveTypeMeta(type: LeaveType): LeaveTypeMeta {
 }
 
 export function normalizeLeaveType(type: string | null | undefined): LeaveType {
-  return isLeaveType(type ?? "") ? type : DEFAULT_LEAVE_TYPE;
+  const value = type ?? "";
+  return isLeaveType(value) ? value : DEFAULT_LEAVE_TYPE;
 }
